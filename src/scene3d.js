@@ -104,9 +104,9 @@ export function createChessScene3D(host, onSquareClick) {
     // Opaque, solid materials: avoid the glass-like look that made pieces
     // appear thin or transparent on some mobile GPUs.
     const glass = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#f4ead7" : "#111923",
-      metalness: isWhite ? 0.08 : 0.24,
-      roughness: isWhite ? 0.27 : 0.22,
+      color: isWhite ? "#e8c995" : "#302019",
+      metalness: isWhite ? 0.06 : 0.12,
+      roughness: isWhite ? 0.3 : 0.26,
       transmission: 0,
       transparent: false,
       opacity: 1,
@@ -114,9 +114,9 @@ export function createChessScene3D(host, onSquareClick) {
       clearcoatRoughness: 0.18
     });
     const metal = new THREE.MeshStandardMaterial({
-      color: "#c49a55",
-      metalness: 0.72,
-      roughness: 0.24
+      color: "#d7ad58",
+      metalness: 0.78,
+      roughness: 0.2
     });
     const stem = new THREE.Mesh(new THREE.LatheGeometry(
       profiles[piece.type].map(([r,y]) => new THREE.Vector2(r,y)), 48
