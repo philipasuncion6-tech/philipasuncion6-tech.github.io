@@ -18,7 +18,7 @@ export function createChessScene3D(host, onSquareClick) {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.15;
+  renderer.toneMappingExposure = 1.2;
   host.appendChild(renderer.domElement);
 
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -35,17 +35,29 @@ export function createChessScene3D(host, onSquareClick) {
   keyLight.position.set(-5, 10, 7);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(2048, 2048);
+  keyLight.shadow.bias = -0.00018;
+  keyLight.shadow.normalBias = 0.025;
+  keyLight.shadow.radius = 5;
   keyLight.shadow.camera.left = -7;
   keyLight.shadow.camera.right = 7;
   keyLight.shadow.camera.top = 7;
   keyLight.shadow.camera.bottom = -7;
   scene.add(keyLight);
+  const fillLight = new THREE.DirectionalLight(0xffffff, 1.15);
+  fillLight.position.set(6, 7, 4);
+  scene.add(fillLight);
   const rimLight = new THREE.PointLight(0x8edcff, 75, 18);
   rimLight.position.set(5, 5, -5);
   scene.add(rimLight);
   const warmLight = new THREE.PointLight(0xffbd72, 42, 16);
   warmLight.position.set(-5, 3, 5);
   scene.add(warmLight);
+
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: "#101819", roughness: 0.88, metalness: 0.04 }));
+  floor.rotation.x = -Math.PI / 2;
+  floor.position.y = -0.34;
+  floor.receiveShadow = true;
+  scene.add(floor);
 
   const boardGroup = new THREE.Group();
   const piecesGroup = new THREE.Group();
@@ -110,8 +122,8 @@ export function createChessScene3D(host, onSquareClick) {
       transmission: 0,
       transparent: false,
       opacity: 1,
-      clearcoat: 0.62,
-      clearcoatRoughness: 0.18
+      clearcoat: 0.9,
+      clearcoatRoughness: 0.12
     });
     const metal = new THREE.MeshStandardMaterial({
       color: "#d7ad58",
@@ -137,6 +149,16 @@ export function createChessScene3D(host, onSquareClick) {
     collar.position.y = .19;
     collar.castShadow = true;
     group.add(collar);
+
+    // Fine gold inlay bands add a turned-wood, handcrafted finish.
+    for (const [radius, tube, y] of [[.255,.012,.115],[.205,.009,.285]]) {
+      const inlay = new THREE.Mesh(new THREE.TorusGeometry(radius,tube,10,48), metal);
+      inlay.rotation.x = Math.PI / 2;
+      inlay.position.y = y;
+      inlay.castShadow = true;
+      inlay.receiveShadow = true;
+      group.add(inlay);
+    }
 
     if (piece.type === "p") {
       const head = new THREE.Mesh(new THREE.SphereGeometry(.105, 32, 24), glass);
@@ -238,9 +260,19 @@ export function createChessScene3D(host, onSquareClick) {
   });
 
   let currentFlipped = null;
+  function disposeGroup(group) {
+    group.traverse(obj => {
+      if (!obj.isMesh) return;
+      obj.geometry?.dispose();
+      if (Array.isArray(obj.material)) obj.material.forEach(material => material.dispose());
+      else obj.material?.dispose();
+    });
+    group.clear();
+  }
+
   function render(game, selectedSquare, legalTargets, lastMove, checkedKing, flipped) {
-    piecesGroup.clear();
-    targetsGroup.clear();
+    disposeGroup(piecesGroup);
+    disposeGroup(targetsGroup);
     pieceMeshes.length = 0;
     for (const [name, tile] of squareMeshes) {
       tile.material = (Number(name[1]) + "abcdefgh".indexOf(name[0])) % 2 ? lightSquare : darkSquare;
