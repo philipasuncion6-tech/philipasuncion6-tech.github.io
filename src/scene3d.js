@@ -152,9 +152,9 @@ export function createChessScene3D(host, onSquareClick) {
     const glass = new THREE.MeshPhysicalMaterial({
       color: isWhite ? "#e8fbff" : "#b00036",
       metalness: 0.025,
-      roughness: 0.035,
-      transmission: 0.18,
-      thickness: 1.45,
+      roughness: 0.065,
+      transmission: 0.42,
+      thickness: 1.8,
       ior: 1.52,
       transparent: false,
       opacity: 1,
@@ -164,8 +164,8 @@ export function createChessScene3D(host, onSquareClick) {
       attenuationDistance: isWhite ? 3.8 : 2.1,
       specularIntensity: 1,
       specularColor: isWhite ? "#ffffff" : "#ffd4e0",
-      envMapIntensity: 2.4,
-      flatShading: false
+      envMapIntensity: 2.8,
+      flatShading: true
     });
     const metal = new THREE.MeshStandardMaterial({
       color: "#e7c477",
@@ -173,7 +173,7 @@ export function createChessScene3D(host, onSquareClick) {
       roughness: 0.2
     });
     const stem = new THREE.Mesh(new THREE.LatheGeometry(
-      profiles[piece.type].map(([r,y]) => new THREE.Vector2(r,y)), 48
+      profiles[piece.type].map(([r,y]) => new THREE.Vector2(r,y)), 10
     ), glass);
     stem.castShadow = true;
     stem.receiveShadow = true;
@@ -203,30 +203,30 @@ export function createChessScene3D(host, onSquareClick) {
     }
 
     if (piece.type === "p") {
-      const head = new THREE.Mesh(new THREE.SphereGeometry(.105, 32, 24), glass);
+      const head = new THREE.Mesh(new THREE.IcosahedronGeometry(.12, 0), glass);
       head.position.y = .79;
       head.castShadow = true;
       group.add(head);
     } else if (piece.type === "n") {
       const horse = new THREE.Group();
-      const neck = new THREE.Mesh(new THREE.CapsuleGeometry(.12,.28,6,16), glass);
+      const neck = new THREE.Mesh(new THREE.CapsuleGeometry(.12,.28,2,6), glass);
       neck.position.set(0,.72,0);
       neck.rotation.z = -.32;
       horse.add(neck);
-      const head = new THREE.Mesh(new THREE.SphereGeometry(.15,24,18), glass);
+      const head = new THREE.Mesh(new THREE.IcosahedronGeometry(.16, 0), glass);
       head.position.set(.02,.91,.01);
       horse.add(head);
-      const muzzle = new THREE.Mesh(new THREE.ConeGeometry(.09,.22,20), glass);
+      const muzzle = new THREE.Mesh(new THREE.ConeGeometry(.09,.22,6), glass);
       muzzle.position.set(.12,.91,.02);
       muzzle.rotation.z = -Math.PI/2;
       horse.add(muzzle);
-      const ear = new THREE.Mesh(new THREE.ConeGeometry(.055,.2,16), glass);
+      const ear = new THREE.Mesh(new THREE.ConeGeometry(.055,.2,5), glass);
       ear.position.set(-.06,1.08,0);
       horse.add(ear);
       horse.rotation.y = Math.PI / 2;
       group.add(horse);
     } else if (piece.type === "b") {
-      const orb = new THREE.Mesh(new THREE.SphereGeometry(.12,28,20), glass);
+      const orb = new THREE.Mesh(new THREE.IcosahedronGeometry(.135, 0), glass);
       orb.position.y = .82;
       group.add(orb);
       const tip = new THREE.Mesh(new THREE.ConeGeometry(.09,.2,24), metal);
@@ -237,7 +237,7 @@ export function createChessScene3D(host, onSquareClick) {
       cut.rotation.z = .55;
       group.add(cut);
     } else if (piece.type === "q") {
-      const crown = new THREE.Mesh(new THREE.SphereGeometry(.16,28,20), glass);
+      const crown = new THREE.Mesh(new THREE.IcosahedronGeometry(.17, 0), glass);
       crown.position.y = .84;
       group.add(crown);
       for (let i=0;i<5;i++) {
