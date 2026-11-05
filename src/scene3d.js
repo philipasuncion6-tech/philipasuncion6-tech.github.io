@@ -102,14 +102,14 @@ export function createChessScene3D(host, onSquareClick) {
     const group = new THREE.Group();
     const isWhite = piece.color === "w";
     const glass = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#eaf8ff" : "#15303a",
-      metalness: isWhite ? 0.08 : 0.32,
-      roughness: isWhite ? 0.08 : 0.16,
-      transmission: 0.88,
+      color: isWhite ? "#f4fbff" : "#173b4a",
+      metalness: isWhite ? 0.12 : 0.38,
+      roughness: isWhite ? 0.2 : 0.23,
+      transmission: 0.28,
       thickness: 0.8,
       ior: 1.48,
-      transparent: true,
-      opacity: isWhite ? 0.9 : 0.94,
+      transparent: false,
+      opacity: 1,
       clearcoat: 1,
       clearcoatRoughness: 0.06
     });
