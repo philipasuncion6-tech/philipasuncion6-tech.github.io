@@ -1,12 +1,17 @@
 import chessPackage from "chess.js";
 import "./style.css";
 
-// chess.js 0.10.3 is CommonJS; this handles its default export in Vite.
-const Chess = chessPackage.Chess || chessPackage.default?.Chess || chessPackage.default || chessPackage;
+const Chess =
+  chessPackage.Chess ||
+  chessPackage.default?.Chess ||
+  chessPackage.default ||
+  chessPackage;
+
 const game = new Chess();
 
 const $ = (id) => document.getElementById(id);
-const boardEl = $("board");
+
+const boardElement = $("board");
 const statusTitle = $("status-title");
 const statusText = $("status-text");
 const statusIcon = $("status-icon");
@@ -14,358 +19,786 @@ const thinkingDots = $("thinking-dots");
 const computerTurn = $("computer-turn");
 const playerTurn = $("player-turn");
 const moveList = $("move-list");
-const toast = $("toast");
+const toastElement = $("toast");
 const promotionModal = $("promotion-modal");
 const promotionOptions = $("promotion-options");
 
-const GLYPHS = {
-  wk: "♔", wq: "♕", wr: "♖", wb: "♗", wn: "♘", wp: "♙",
-  bk: "♚", bq: "♛", br: "♜", bb: "♝", bn: "♞", bp: "♟"
+const glyphs = {
+  w: {
+    k: "♔", q: "♕", r: "♖",
+    b: "♗", n: "♘", p: "♙"
+  },
+  b: {
+    k: "♚", q: "♛", r: "♜",
+    b: "♝", n: "♞", p: "♟"
+  }
 };
-const VALUES = { p: 100, n: 320, b: 335, r: 500, q: 900, k: 20000 };
-const FILES = "abcdefgh";
-let selected = null;
+
+const pieceValues = {
+  p: 100,
+  n: 320,
+  b: 330,
+  r: 500,
+  q: 900,
+  k: 20000
+};
+
+let selectedSquare = null;
 let legalTargets = [];
-let flipped = false;
+let lastMove = null;
+let flipped = true;
 let thinking = false;
 let pendingPromotion = null;
 let toastTimer = null;
+let computerMoveToken = 0;
+
+// AI SETTINGS
+const MATE_SCORE = 100000;
+const AI_SEARCH_DEPTH = 3;
 
 function showToast(message) {
-  toast.textContent = message;
-  toast.classList.add("show");
+  toastElement.textContent = message;
+  toastElement.classList.add("show");
+
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
-}
-function isComputerTurn() { return game.turn() === "w"; }
-function gameEnded() { return game.game_over(); }
-
-function render() {
-  boardEl.innerHTML = "";
-  const squares = [];
-  for (let rank = 0; rank < 8; rank++) {
-    for (let file = 0; file < 8; file++) {
-      const square = FILES[file] + (8 - rank);
-      squares.push(square);
-    }
-  }
-  if (flipped) squares.reverse();
-
-  const last = game.history({ verbose: true }).slice(-1)[0];
-  const checkedKing = game.in_check() ? findKingSquare(game.turn()) : null;
-
-  for (const square of squares) {
-    const piece = game.get(square);
-    const file = FILES.indexOf(square[0]);
-    const rank = Number(square[1]);
-    const cell = document.createElement("button");
-    cell.type = "button";
-    cell.className = "square " + ((file + rank) % 2 === 0 ? "sq-light" : "sq-dark");
-    cell.setAttribute("aria-label", `${square}${piece ? " " + piece.color + " " + piece.type : ""}`);
-    cell.dataset.square = square;
-
-    if (selected === square) cell.classList.add("selected");
-    if (last && (last.from === square || last.to === square)) cell.classList.add("last-move");
-    if (checkedKing === square) cell.classList.add("in-check");
-
-    if (legalTargets.includes(square)) {
-      cell.classList.add(piece ? "capture-target" : "move-target");
-    }
-
-    if (piece) {
-      const pieceEl = document.createElement("span");
-      pieceEl.className = "piece " + (piece.color === "w" ? "white-piece" : "black-piece");
-      pieceEl.textContent = GLYPHS[piece.color + piece.type];
-      cell.appendChild(pieceEl);
-    }
-
-    const shownFile = flipped ? FILES[7-file] : FILES[file];
-    const shownRank = flipped ? 9-rank : rank;
-    if ((!flipped && file === 0) || (flipped && file === 7)) {
-      const coord = document.createElement("span");
-      coord.className = "coordinate rank-coordinate";
-      coord.textContent = shownRank;
-      cell.appendChild(coord);
-    }
-    if ((!flipped && rank === 1) || (flipped && rank === 8)) {
-      const coord = document.createElement("span");
-      coord.className = "coordinate file-coordinate";
-      coord.textContent = shownFile;
-      cell.appendChild(coord);
-    }
-
-    cell.addEventListener("click", () => onSquareClick(square));
-    boardEl.appendChild(cell);
-  }
-  updatePanels();
+  toastTimer = setTimeout(() => {
+    toastElement.classList.remove("show");
+  }, 2200);
 }
 
-function findKingSquare(color) {
-  const squares = game.board();
-  for (let r = 0; r < 8; r++) {
-    for (let f = 0; f < 8; f++) {
-      const p = squares[r][f];
-      if (p && p.type === "k" && p.color === color) return FILES[f] + (8-r);
+function squareName(file, rank) {
+  return "abcdefgh"[file] + rank;
+}
+
+function findKing(color) {
+  const rows = game.board();
+
+  for (const row of rows) {
+    for (const piece of row) {
+      if (piece && piece.type === "k" && piece.color === color) {
+        return piece.square;
+      }
     }
   }
+
   return null;
 }
 
-function updatePanels() {
-  const over = gameEnded();
-  const turn = game.turn();
-  const inCheck = game.in_check();
-  const history = game.history();
-  const moveNumber = Math.floor(history.length / 2) + 1;
+function renderBoard() {
+  boardElement.innerHTML = "";
 
-  $("side-to-move").textContent = turn === "w" ? "White" : "Black";
-  $("move-number").textContent = String(moveNumber);
-  $("game-result").textContent = over ? (game.in_checkmate() ? "Checkmate" : "Draw") : "In progress";
+  const rows = flipped
+    ? [1, 2, 3, 4, 5, 6, 7, 8]
+    : [8, 7, 6, 5, 4, 3, 2, 1];
 
-  computerTurn.classList.toggle("active", turn === "w" && !over);
-  playerTurn.classList.toggle("active", turn === "b" && !over);
-  computerTurn.textContent = thinking ? "THINKING" : (turn === "w" && !over ? "TO MOVE" : "WAITING");
-  playerTurn.textContent = turn === "b" && !over ? "YOUR TURN" : "WAITING";
-  thinkingDots.classList.toggle("visible", thinking);
+  const files = flipped
+    ? [7, 6, 5, 4, 3, 2, 1, 0]
+    : [0, 1, 2, 3, 4, 5, 6, 7];
 
-  if (game.in_checkmate()) {
-    const winner = turn === "w" ? "Black wins!" : "White wins!";
-    statusIcon.textContent = "♛";
-    statusTitle.textContent = "CHECKMATE";
-    statusText.textContent = winner;
-  } else if (game.in_draw()) {
-    statusIcon.textContent = "½";
-    statusTitle.textContent = "Game drawn";
-    statusText.textContent = "The game has ended in a draw.";
-  } else if (thinking) {
-    statusIcon.textContent = "♜";
-    statusTitle.textContent = "Computer is thinking…";
-    statusText.textContent = "The computer is calculating its next move.";
-  } else if (turn === "b") {
-    statusIcon.textContent = inCheck ? "⚠" : "♟";
-    statusTitle.textContent = inCheck ? "Your king is in check!" : "Your turn — play as Black";
-    statusText.textContent = inCheck ? "Move your king or block/capture the attacking piece." : "Select one of your black pieces, then choose a highlighted square.";
-  } else {
-    statusIcon.textContent = "♔";
-    statusTitle.textContent = "Computer to move";
-    statusText.textContent = "White plays against you.";
+  const checkedKing = game.in_check()
+    ? findKing(game.turn())
+    : null;
+
+  const history = game.history({ verbose: true });
+
+  lastMove = history.length
+    ? history[history.length - 1]
+    : null;
+
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const rank = rows[row];
+      const file = files[col];
+      const name = squareName(file, rank);
+      const piece = game.get(name);
+
+      const square = document.createElement("div");
+      square.className = "square";
+
+      const isLight = (file + rank) % 2 === 1;
+      square.classList.add(isLight ? "sq-light" : "sq-dark");
+
+      square.dataset.square = name;
+
+      if (selectedSquare === name) {
+        square.classList.add("selected");
+      }
+
+      if (
+        lastMove &&
+        (lastMove.from === name || lastMove.to === name)
+      ) {
+        square.classList.add("last-move");
+      }
+
+      if (checkedKing === name) {
+        square.classList.add("in-check");
+      }
+
+      if (legalTargets.includes(name)) {
+        square.classList.add(
+          piece ? "capture-target" : "move-target"
+        );
+      }
+
+      if (piece) {
+        const pieceElement = document.createElement("span");
+
+        pieceElement.className =
+          "piece " +
+          (piece.color === "w" ? "white-piece" : "black-piece");
+
+        pieceElement.textContent = glyphs[piece.color][piece.type];
+
+        square.appendChild(pieceElement);
+      }
+
+      if (col === 0) {
+        const rankLabel = document.createElement("span");
+        rankLabel.className = "coordinate rank-coordinate";
+        rankLabel.textContent = rank;
+        square.appendChild(rankLabel);
+      }
+
+      if (row === 7) {
+        const fileLabel = document.createElement("span");
+        fileLabel.className = "coordinate file-coordinate";
+        fileLabel.textContent = "abcdefgh"[file];
+        square.appendChild(fileLabel);
+      }
+
+      square.addEventListener("click", () => {
+        handleSquareClick(name);
+      });
+
+      boardElement.appendChild(square);
+    }
   }
-
-  renderHistory();
 }
 
-function renderHistory() {
-  const history = game.history();
-  if (!history.length) {
-    moveList.innerHTML = '<div class="empty-history">Moves will appear here.</div>';
+function clearSelection() {
+  selectedSquare = null;
+  legalTargets = [];
+}
+
+function handleSquareClick(name) {
+  if (thinking || game.game_over() || pendingPromotion) {
     return;
   }
-  moveList.innerHTML = "";
-  for (let i = 0; i < history.length; i += 2) {
-    const row = document.createElement("div");
-    row.className = "move-row";
-    const num = document.createElement("span");
-    num.className = "move-num";
-    num.textContent = `${Math.floor(i / 2) + 1}.`;
-    const white = document.createElement("span");
-    white.className = "white-notation";
-    white.textContent = history[i] || "—";
-    const black = document.createElement("span");
-    black.className = "black-notation";
-    black.textContent = history[i + 1] || "…";
-    row.append(num, white, black);
-    moveList.appendChild(row);
+
+  // Player controls Black only.
+  if (game.turn() !== "b") {
+    showToast("Wait for the computer to move.");
+    return;
   }
-  moveList.scrollTop = moveList.scrollHeight;
-}
 
-function onSquareClick(square) {
-  if (thinking || gameEnded() || isComputerTurn() || pendingPromotion) return;
-  const piece = game.get(square);
+  const piece = game.get(name);
 
-  if (selected) {
-    const candidates = game.moves({ square: selected, verbose: true }).filter(m => m.to === square);
-    if (candidates.length) {
-      const promotionMoves = candidates.filter(m => m.promotion);
-      if (promotionMoves.length) {
-        openPromotion(promotionMoves);
-        return;
+  if (selectedSquare) {
+    const moves = game.moves({
+      square: selectedSquare,
+      verbose: true
+    });
+
+    const matchingMoves = moves.filter(
+      move => move.to === name
+    );
+
+    if (matchingMoves.length > 0) {
+      if (matchingMoves.some(move => move.promotion)) {
+        openPromotion(matchingMoves);
+      } else {
+        makePlayerMove(selectedSquare, name);
       }
-      makePlayerMove(selected, square);
       return;
     }
   }
 
   if (piece && piece.color === "b") {
-    selected = square;
-    legalTargets = game.moves({ square, verbose: true }).map(m => m.to);
-  } else {
-    selected = null;
-    legalTargets = [];
+    selectedSquare = name;
+
+    legalTargets = game.moves({
+      square: name,
+      verbose: true
+    }).map(move => move.to);
+
+    renderBoard();
+    return;
   }
-  render();
+
+  clearSelection();
+  renderBoard();
 }
 
 function makePlayerMove(from, to, promotion = "q") {
-  const result = game.move({ from, to, promotion });
-  selected = null;
-  legalTargets = [];
+  let move;
+
+  try {
+    move = game.move({
+      from,
+      to,
+      promotion
+    });
+  } catch (error) {
+    move = null;
+  }
+
+  closePromotion();
+  clearSelection();
+
+  if (!move) {
+    showToast("Invalid move.");
+    render();
+    return;
+  }
+
   render();
-  if (result) {
-    if (!gameEnded()) window.setTimeout(computerMove, 350);
-  } else {
-    showToast("That move is not legal.");
+
+  if (!game.game_over()) {
+    startComputerMove();
   }
 }
 
 function openPromotion(moves) {
   pendingPromotion = moves;
   promotionOptions.innerHTML = "";
-  const choices = [
-    ["q", "♛", "Queen"], ["r", "♜", "Rook"],
-    ["b", "♝", "Bishop"], ["n", "♞", "Knight"]
-  ];
-  for (const [type, glyph, label] of choices) {
+
+  const choices = ["q", "r", "b", "n"];
+
+  choices.forEach(type => {
     const button = document.createElement("button");
+
     button.className = "promotion-choice";
-    button.innerHTML = `<span>${glyph}</span><small>${label}</small>`;
+    button.textContent = glyphs.b[type];
+    button.setAttribute("aria-label", type);
+
     button.addEventListener("click", () => {
-      const move = pendingPromotion.find(m => m.promotion === type);
-      if (move) makePlayerMove(move.from, move.to, type);
-      closePromotion();
+      const move = pendingPromotion.find(
+        item => item.promotion === type
+      );
+
+      if (move) {
+        makePlayerMove(move.from, move.to, type);
+      }
     });
+
     promotionOptions.appendChild(button);
-  }
+  });
+
   promotionModal.classList.remove("hidden");
+  promotionModal.classList.add("show");
 }
+
 function closePromotion() {
   pendingPromotion = null;
   promotionModal.classList.add("hidden");
+  promotionModal.classList.remove("show");
 }
 
-function evaluatePosition() {
-  if (game.in_checkmate()) return game.turn() === "w" ? -100000 : 100000;
-  if (game.in_draw()) return 0;
+// ======================================
+// CHESS AI - POSITION EVALUATION
+// ======================================
+
+function evaluatePosition(position, ply = 0) {
+  if (position.in_checkmate()) {
+    return position.turn() === "w"
+      ? -MATE_SCORE + ply
+      : MATE_SCORE - ply;
+  }
+
+  if (position.game_over()) return 0;
+
   let score = 0;
-  const board = game.board();
+  const rows = position.board();
+
+  let whiteBishops = 0;
+  let blackBishops = 0;
+
   for (let r = 0; r < 8; r++) {
     for (let f = 0; f < 8; f++) {
-      const p = board[r][f];
-      if (!p) continue;
-      const value = VALUES[p.type];
-      const advancement = p.type === "p" ? (p.color === "w" ? 6-r : r-1) * 7 : 0;
-      const center = 3.5 - (Math.abs(3.5-f) + Math.abs(3.5-r)) / 2;
-      const positional = p.type === "n" || p.type === "b" ? center * 5 : 0;
-      score += (p.color === "w" ? 1 : -1) * (value + advancement + positional);
+      const piece = rows[r][f];
+
+      if (!piece) continue;
+
+      const sign = piece.color === "w" ? 1 : -1;
+
+      let value = pieceValues[piece.type];
+
+      const centerDistance =
+        Math.abs(3.5 - f) + Math.abs(3.5 - r);
+
+      const centerBonus =
+        Math.round((7 - centerDistance) * 3);
+
+      value += centerBonus;
+
+      // Encourage pawn advancement.
+      if (piece.type === "p") {
+        const advance = piece.color === "w"
+          ? 6 - r
+          : r - 1;
+
+        value += Math.max(0, advance) * 7;
+      }
+
+      if (piece.type === "b") {
+        if (piece.color === "w") {
+          whiteBishops++;
+        } else {
+          blackBishops++;
+        }
+      }
+
+      score += sign * value;
     }
   }
+
+  // Bishop pair bonus.
+  if (whiteBishops >= 2) score += 30;
+  if (blackBishops >= 2) score -= 30;
+
   return score;
 }
 
-function minimax(depth, alpha, beta, maximizing) {
-  if (depth === 0 || game.game_over()) return evaluatePosition();
-  const moves = game.moves({ verbose: true });
+// ======================================
+// MOVE ORDERING
+// ======================================
+
+function moveOrderScore(move) {
+  let score = 0;
+
+  if (move.captured) {
+    score +=
+      10 * pieceValues[move.captured] -
+      pieceValues[move.piece] / 10;
+  }
+
+  if (move.promotion) {
+    score += pieceValues[move.promotion] + 800;
+  }
+
+  if (move.san && move.san.includes("+")) {
+    score += 50;
+  }
+
+  if (move.san && move.san.includes("#")) {
+    score += 100000;
+  }
+
+  return score;
+}
+
+function orderedMoves(position) {
+  return position.moves({ verbose: true })
+    .sort((a, b) => moveOrderScore(b) - moveOrderScore(a));
+}
+
+// ======================================
+// MINIMAX + ALPHA BETA PRUNING
+// ======================================
+
+function minimax(
+  position,
+  depth,
+  alpha,
+  beta,
+  maximizing,
+  ply = 0
+) {
+  if (
+    position.in_checkmate() ||
+    position.game_over() ||
+    depth <= 0
+  ) {
+    return evaluatePosition(position, ply);
+  }
+
+  const moves = orderedMoves(position);
+
+  if (!moves.length) {
+    return evaluatePosition(position, ply);
+  }
+
   if (maximizing) {
     let best = -Infinity;
-    for (const m of orderMoves(moves)) {
-      game.move(m);
-      best = Math.max(best, minimax(depth - 1, alpha, beta, false));
-      game.undo();
+
+    for (const move of moves) {
+      position.move(move.san);
+
+      let score;
+
+      try {
+        score = minimax(
+          position,
+          depth - 1,
+          alpha,
+          beta,
+          false,
+          ply + 1
+        );
+      } finally {
+        position.undo();
+      }
+
+      best = Math.max(best, score);
       alpha = Math.max(alpha, best);
+
       if (beta <= alpha) break;
     }
-    return best;
-  } else {
-    let best = Infinity;
-    for (const m of orderMoves(moves)) {
-      game.move(m);
-      best = Math.min(best, minimax(depth - 1, alpha, beta, true));
-      game.undo();
-      beta = Math.min(beta, best);
-      if (beta <= alpha) break;
-    }
+
     return best;
   }
-}
 
-function orderMoves(moves) {
-  return moves.slice().sort((a, b) => {
-    const score = m => (m.captured ? VALUES[m.captured] * 10 : 0) + (m.promotion ? VALUES[m.promotion] : 0);
-    return score(b) - score(a);
-  });
-}
+  let best = Infinity;
 
-function computerMove() {
-  if (thinking || gameEnded() || !isComputerTurn()) return;
-  thinking = true;
-  updatePanels();
+  for (const move of moves) {
+    position.move(move.san);
 
-  window.setTimeout(() => {
-    const moves = orderMoves(game.moves({ verbose: true }));
-    if (!moves.length) {
-      thinking = false;
-      render();
-      return;
+    let score;
+
+    try {
+      score = minimax(
+        position,
+        depth - 1,
+        alpha,
+        beta,
+        true,
+        ply + 1
+      );
+    } finally {
+      position.undo();
     }
 
-    let bestScore = -Infinity;
-    let bestMoves = [];
-    for (const move of moves) {
-      game.move(move);
-      const score = minimax(2, -Infinity, Infinity, false);
+    best = Math.min(best, score);
+    beta = Math.min(beta, best);
+
+    if (beta <= alpha) break;
+  }
+
+  return best;
+}
+
+// ======================================
+// COMPUTER MOVE SELECTION
+// Computer is WHITE.
+// Player is BLACK.
+// ======================================
+
+function chooseComputerMove() {
+  const moves = orderedMoves(game);
+
+  if (!moves.length) return null;
+
+  let bestScore = -Infinity;
+  let bestMoves = [];
+
+  for (const move of moves) {
+    game.move(move.san);
+
+    let score;
+
+    try {
+      score = minimax(
+        game,
+        AI_SEARCH_DEPTH - 1,
+        -Infinity,
+        Infinity,
+        false,
+        1
+      );
+    } finally {
       game.undo();
-      if (score > bestScore) {
-        bestScore = score;
-        bestMoves = [move];
-      } else if (score === bestScore) {
-        bestMoves.push(move);
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestMoves = [move];
+    } else if (score === bestScore) {
+      bestMoves.push(move);
+    }
+  }
+
+  // Random only among equally strong moves.
+  return bestMoves[
+    Math.floor(Math.random() * bestMoves.length)
+  ] || moves[0];
+}
+
+// ======================================
+// COMPUTER TURN
+// ======================================
+
+function startComputerMove() {
+  if (
+    game.game_over() ||
+    game.turn() !== "w" ||
+    thinking
+  ) {
+    render();
+    return;
+  }
+
+  const token = ++computerMoveToken;
+
+  thinking = true;
+  render();
+
+  setTimeout(() => {
+    // Ignore an old delayed move after New Game or Undo.
+    if (token !== computerMoveToken) return;
+
+    let errorMessage = "";
+
+    try {
+      if (
+        !game.game_over() &&
+        game.turn() === "w"
+      ) {
+        const move = chooseComputerMove();
+
+        if (!move) {
+          throw new Error("No legal computer move found.");
+        }
+
+        const played = game.move({
+          from: move.from,
+          to: move.to,
+          promotion: move.promotion || "q"
+        });
+
+        if (!played) {
+          throw new Error("Computer move was rejected.");
+        }
+      }
+    } catch (error) {
+      console.error("Computer AI error:", error);
+      errorMessage = "Computer error: " + error.message;
+    } finally {
+      if (token === computerMoveToken) {
+        thinking = false;
+        clearSelection();
+        render();
+
+        if (errorMessage) {
+          showToast(errorMessage);
+        }
       }
     }
-    const chosen = bestMoves[Math.floor(Math.random() * bestMoves.length)] || moves[0];
-    game.move({ from: chosen.from, to: chosen.to, promotion: chosen.promotion || "q" });
-    thinking = false;
-    selected = null;
-    legalTargets = [];
-    render();
-  }, 120);
+  }, 250);
 }
+
+// ======================================
+// MOVE HISTORY
+// ======================================
+
+function updateHistory() {
+  const history = game.history({ verbose: true });
+
+  if (!history.length) {
+    moveList.innerHTML =
+      '<div class="empty-history">Moves will appear here.</div>';
+    return;
+  }
+
+  moveList.innerHTML = "";
+
+  for (let i = 0; i < history.length; i += 2) {
+    const whiteMove = history[i];
+    const blackMove = history[i + 1];
+
+    const row = document.createElement("div");
+    row.className = "move-row";
+
+    const number = document.createElement("span");
+    number.className = "move-num";
+    number.textContent = `${Math.floor(i / 2) + 1}.`;
+
+    const white = document.createElement("span");
+    white.className = "white-notation";
+    white.textContent = whiteMove.san;
+
+    const black = document.createElement("span");
+    black.className = "black-notation";
+    black.textContent = blackMove ? blackMove.san : "…";
+
+    row.append(number, white, black);
+    moveList.appendChild(row);
+  }
+}
+
+// ======================================
+// GAME STATUS AND PANELS
+// ======================================
+
+function updatePanels() {
+  const whiteToMove = game.turn() === "w";
+  const over = game.game_over();
+
+  $("side-to-move").textContent =
+    whiteToMove ? "White" : "Black";
+
+  $("move-number").textContent =
+  Math.floor(game.history().length / 2) + 1;
+
+  let result = "In progress";
+  let title = "Your turn";
+  let message = "Choose one of your Black pieces.";
+  let icon = "♟";
+
+  if (game.in_checkmate()) {
+    result = whiteToMove ? "Black wins" : "White wins";
+
+    title = whiteToMove
+      ? "Computer wins!"
+      : "Checkmate! You win!";
+
+    message = "The game has ended by checkmate.";
+    icon = "♛";
+  } else if (game.in_stalemate()) {
+    result = "Draw";
+    title = "Stalemate!";
+    message = "Neither side can make a legal move.";
+    icon = "½";
+  } else if (game.in_draw()) {
+    result = "Draw";
+    title = "Game drawn";
+    message = "The game ended in a draw.";
+    icon = "½";
+  } else if (thinking) {
+    title = "Computer is thinking...";
+    message = "The computer is calculating its next move.";
+    icon = "♚";
+  } else if (whiteToMove) {
+    title = "Computer's turn";
+    message = "The computer is preparing its move.";
+    icon = "♚";
+  } else if (game.in_check()) {
+    title = "You are in check!";
+    message = "Protect your king immediately.";
+    icon = "⚠";
+  }
+
+  $("game-result").textContent = result;
+  statusTitle.textContent = title;
+  statusText.textContent = message;
+  statusIcon.textContent = icon;
+
+  computerTurn.textContent = thinking
+    ? "THINKING"
+    : whiteToMove && !over
+      ? "COMPUTER TURN"
+      : "COMPUTER";
+
+  playerTurn.textContent =
+    !whiteToMove && !over ? "YOUR TURN" : "WAIT";
+
+  computerTurn.classList.toggle(
+    "active",
+    whiteToMove && !over
+  );
+
+  playerTurn.classList.toggle(
+    "active",
+    !whiteToMove && !over
+  );
+
+  thinkingDots.classList.toggle("visible", thinking);
+}
+
+function render() {
+  renderBoard();
+  updatePanels();
+  updateHistory();
+}
+
+// ======================================
+// NEW GAME
+// ======================================
 
 function newGame() {
+  computerMoveToken++;
+
   game.reset();
-  selected = null;
-  legalTargets = [];
-  thinking = false;
+
+  clearSelection();
   closePromotion();
+
+  thinking = false;
+
   render();
-  window.setTimeout(computerMove, 450);
+
+  showToast("New game started!");
+
+  // Computer plays White first.
+  startComputerMove();
 }
 
-function undoTurn() {
-  if (thinking || game.history().length === 0) return;
-  closePromotion();
-  selected = null;
-  legalTargets = [];
-  // Undo a player's move and the computer's preceding move, where available.
-  if (game.turn() === "w") {
-    game.undo(); // undo computer's last move
-    if (game.history().length) game.undo(); // undo player's last move
-  } else {
+// ======================================
+// UNDO
+// ======================================
+
+function undoMove() {
+  if (thinking || pendingPromotion) return;
+
+  if (game.history().length === 0) {
+    showToast("No moves to undo.");
+    return;
+  }
+
+  computerMoveToken++;
+
+  // Remove computer's last move.
+  game.undo();
+
+  // Remove player's previous move too.
+  if (
+    game.turn() === "b" &&
+    game.history().length > 0
+  ) {
     game.undo();
   }
+
+  clearSelection();
+  closePromotion();
+
+  thinking = false;
+
   render();
-  if (game.turn() === "w" && game.history().length === 0) {
-    window.setTimeout(computerMove, 350);
-  }
+
+  showToast("Previous turn restored.");
 }
 
-$("new-game").addEventListener("click", newGame);
-$("undo").addEventListener("click", undoTurn);
-$("flip").addEventListener("click", () => {
-  flipped = !flipped;
-  render();
-});
-$("cancel-promotion").addEventListener("click", closePromotion);
+// ======================================
+// FLIP BOARD
+// ======================================
 
-// Computer is White and makes the opening move.
+function flipBoard() {
+  flipped = !flipped;
+  renderBoard();
+}
+
+// ======================================
+// BUTTON EVENTS
+// ======================================
+
+$("new-game").addEventListener("click", newGame);
+
+$("undo").addEventListener("click", undoMove);
+
+$("flip").addEventListener("click", flipBoard);
+
+$("cancel-promotion").addEventListener("click", () => {
+  closePromotion();
+  clearSelection();
+  renderBoard();
+});
+
+// ======================================
+// START GAME
+// ======================================
+
+// Computer plays White first.
+// Player controls Black.
+
 render();
-window.setTimeout(computerMove, 500);
+startComputerMove();
