@@ -1,4 +1,4 @@
-import chessPackage from "chess.js";
+mimport chessPackage from "chess.js";
 import "./style.css";
 
 // chess.js 0.10.3 is CommonJS; this handles its default export in Vite.
@@ -219,28 +219,42 @@ function makePlayerMove(from, to, promotion = "q") {
 }
 
 function openPromotion(moves) {
+  if (!moves || !moves.length) return;
+
   pendingPromotion = moves;
   promotionOptions.innerHTML = "";
+
   const choices = [
-    ["q", "♛", "Queen"], ["r", "♜", "Rook"],
-    ["b", "♝", "Bishop"], ["n", "♞", "Knight"]
+    ["q", "♛", "Queen"],
+    ["r", "♜", "Rook"],
+    ["b", "♝", "Bishop"],
+    ["n", "♞", "Knight"]
   ];
+
   for (const [type, glyph, label] of choices) {
     const button = document.createElement("button");
     button.className = "promotion-choice";
     button.innerHTML = `<span>${glyph}</span><small>${label}</small>`;
+
     button.addEventListener("click", () => {
+      if (!pendingPromotion) return;
+
       const move = pendingPromotion.find(m => m.promotion === type);
-      if (move) makePlayerMove(move.from, move.to, type);
       closePromotion();
+
+      if (move) makePlayerMove(move.from, move.to, type);
     });
+
     promotionOptions.appendChild(button);
   }
-  promotionModal.classList.remove("hidden");
+
+  promotionModal.hidden = false;
 }
+
 function closePromotion() {
   pendingPromotion = null;
-  promotionModal.classList.add("hidden");
+  promotionModal.hidden = true;
+  promotionOptions.innerHTML = "";
 }
 
 function evaluatePosition() {
