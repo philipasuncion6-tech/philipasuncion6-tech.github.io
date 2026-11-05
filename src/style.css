@@ -122,4 +122,4 @@ button { font: inherit; }
   .control-btn { font-size:9px;min-height:39px; }
   .side-panel { grid-template-columns:1fr; }
   .history-card { grid-row:auto; }
-}
+           }
