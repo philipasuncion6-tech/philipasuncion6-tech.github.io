@@ -241,10 +241,13 @@ export function createChessScene3D(host, onSquareClick) {
       if (checkedKing === name) tile.material = new THREE.MeshStandardMaterial({ color: "#b43a32", emissive: "#8f160d", emissiveIntensity: .55 });
     }
     const board = game.board();
-    for (let row=0;row<8;row++) {
-      for (let col=0;col<8;col++) {
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
         const piece = board[row][col];
-        if (piece) makePiece(piece, piece.square);
+        if (piece) {
+          const square = "abcdefgh"[col] + (8 - row);
+          makePiece(piece, square);
+        }
       }
     }
     for (const name of legalTargets) {
