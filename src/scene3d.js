@@ -49,7 +49,8 @@ export function createChessScene3D(host, onSquareClick) {
 
   const boardGroup = new THREE.Group();
   const piecesGroup = new THREE.Group();
-  scene.add(boardGroup, piecesGroup);
+  const targetsGroup = new THREE.Group();
+  scene.add(boardGroup, piecesGroup, targetsGroup);
 
   const wood = new THREE.MeshStandardMaterial({ color: "#56331f", roughness: 0.32, metalness: 0.12 });
   const lightSquare = new THREE.MeshStandardMaterial({ color: "#e8d2aa", roughness: 0.3, metalness: 0.04 });
@@ -231,6 +232,7 @@ export function createChessScene3D(host, onSquareClick) {
   let currentFlipped = null;
   function render(game, selectedSquare, legalTargets, lastMove, checkedKing, flipped) {
     piecesGroup.clear();
+    targetsGroup.clear();
     pieceMeshes.length = 0;
     for (const [name, tile] of squareMeshes) {
       tile.material = (Number(name[1]) + "abcdefgh".indexOf(name[0])) % 2 ? lightSquare : darkSquare;
@@ -250,7 +252,7 @@ export function createChessScene3D(host, onSquareClick) {
       const dot = new THREE.Mesh(new THREE.CircleGeometry(.14,24), targetMat);
       dot.rotation.x = -Math.PI/2;
       dot.position.set(file-3.5,.315,4.5-rank);
-      boardGroup.add(dot);
+      targetsGroup.add(dot);
     }
     if (currentFlipped !== flipped) {
       camera.position.set(0, 10.5, flipped ? -12.8 : 12.8);
