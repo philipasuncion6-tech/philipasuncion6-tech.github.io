@@ -145,3 +145,5 @@ button { font: inherit; }
   .board-stage { aspect-ratio: 1 / 1.08; }
   .three-board-host { min-height: 290px; }
 }
+
+.chessboard.three-board-host { display: block; }
