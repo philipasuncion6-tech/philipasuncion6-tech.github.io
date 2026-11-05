@@ -135,17 +135,23 @@ export function createChessScene3D(host, onSquareClick) {
   function makePiece(piece, square) {
     const group = new THREE.Group();
     const isWhite = piece.color === "w";
-    // Opaque, solid materials: avoid the glass-like look that made pieces
-    // appear thin or transparent on some mobile GPUs.
+    // Faceted crystal chessmen: clear diamond/ice crystal for White
+    // and deep ruby crystal for Black, with polished jewel-like reflections.
     const glass = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#f4e2bd" : "#211712",
-      metalness: isWhite ? 0.12 : 0.2,
-      roughness: isWhite ? 0.22 : 0.2,
-      transmission: 0,
+      color: isWhite ? "#dff7ff" : "#a80032",
+      metalness: 0.04,
+      roughness: 0.075,
+      transmission: 0.42,
+      thickness: 0.9,
+      ior: 1.52,
       transparent: false,
       opacity: 1,
       clearcoat: 1,
-      clearcoatRoughness: 0.08
+      clearcoatRoughness: 0.035,
+      attenuationColor: isWhite ? "#b9eaff" : "#72001f",
+      attenuationDistance: isWhite ? 2.2 : 1.15,
+      specularIntensity: 1,
+      envMapIntensity: 1.35
     });
     const metal = new THREE.MeshStandardMaterial({
       color: "#e7c477",
