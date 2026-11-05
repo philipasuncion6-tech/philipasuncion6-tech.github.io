@@ -98,7 +98,9 @@ button { font: inherit; }
 .toast { position:fixed;left:50%;bottom:22px;transform:translate(-50%,15px);opacity:0;pointer-events:none;background:#d6ad70;color:#172126;padding:10px 15px;border-radius:9px;font-size:12px;font-weight:700;box-shadow:0 8px 30px #0008;transition:.2s;z-index:20;max-width:90vw;text-align:center; }
 .toast.show { opacity:1;transform:translate(-50%,0); }
 .promotion-modal { position:fixed;inset:0;background:#03090cbb;display:grid;place-items:center;padding:20px;z-index:30; }
-.promotion-modal.hidden { display:none; }
+.promotion-modal.hidden { display:none; } .promotion-modal[hidden] {
+  display: none !important;
+}
 .promotion-box { width:min(100%,340px);padding:22px;border-radius:16px;border:1px solid #a47d4b;background:#17262b;text-align:center;box-shadow:0 20px 60px #000b; }
 .promotion-box h3 { margin:0;font:700 25px "Barlow Condensed",sans-serif; }.promotion-box p { color:#9caeae;font-size:12px; }
 .promotion-options { display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:18px 0; }
