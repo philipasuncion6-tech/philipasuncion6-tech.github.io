@@ -75,10 +75,11 @@ function squareName(file, rank) {
 function findKing(color) {
   const rows = game.board();
 
-  for (const row of rows) {
-    for (const piece of row) {
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const piece = rows[row][col];
       if (piece && piece.type === "k" && piece.color === color) {
-        return piece.square;
+        return "abcdefgh"[col] + (8 - row);
       }
     }
   }
