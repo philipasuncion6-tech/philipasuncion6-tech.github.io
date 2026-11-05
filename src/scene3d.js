@@ -101,22 +101,22 @@ export function createChessScene3D(host, onSquareClick) {
   function makePiece(piece, square) {
     const group = new THREE.Group();
     const isWhite = piece.color === "w";
+    // Opaque, solid materials: avoid the glass-like look that made pieces
+    // appear thin or transparent on some mobile GPUs.
     const glass = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#f4fbff" : "#173b4a",
-      metalness: isWhite ? 0.12 : 0.38,
-      roughness: isWhite ? 0.2 : 0.23,
-      transmission: 0.28,
-      thickness: 0.8,
-      ior: 1.48,
+      color: isWhite ? "#f4ead7" : "#111923",
+      metalness: isWhite ? 0.08 : 0.24,
+      roughness: isWhite ? 0.27 : 0.22,
+      transmission: 0,
       transparent: false,
       opacity: 1,
-      clearcoat: 1,
-      clearcoatRoughness: 0.06
+      clearcoat: 0.62,
+      clearcoatRoughness: 0.18
     });
     const metal = new THREE.MeshStandardMaterial({
-      color: isWhite ? "#dceaf0" : "#b58b53",
-      metalness: 0.86,
-      roughness: 0.2
+      color: "#c49a55",
+      metalness: 0.72,
+      roughness: 0.24
     });
     const stem = new THREE.Mesh(new THREE.LatheGeometry(
       profiles[piece.type].map(([r,y]) => new THREE.Vector2(r,y)), 48
@@ -125,10 +125,18 @@ export function createChessScene3D(host, onSquareClick) {
     stem.receiveShadow = true;
     group.add(stem);
 
-    const foot = new THREE.Mesh(new THREE.CylinderGeometry(.29,.32,.07,48), metal);
-    foot.position.y = .055;
+    const foot = new THREE.Mesh(new THREE.CylinderGeometry(.29,.32,.09,48), metal);
+    foot.position.y = .065;
     foot.castShadow = true;
     group.add(foot);
+    const collar = new THREE.Mesh(
+      new THREE.TorusGeometry(.235,.025,12,48),
+      metal
+    );
+    collar.rotation.x = Math.PI / 2;
+    collar.position.y = .19;
+    collar.castShadow = true;
+    group.add(collar);
 
     if (piece.type === "p") {
       const head = new THREE.Mesh(new THREE.SphereGeometry(.105, 32, 24), glass);
