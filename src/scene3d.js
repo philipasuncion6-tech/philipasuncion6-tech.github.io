@@ -6,8 +6,8 @@ export function createChessScene3D(host, onSquareClick) {
   host.classList.add("three-board-host");
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color("#101a1b");
-  scene.fog = new THREE.Fog("#101a1b", 16, 30);
+  scene.background = new THREE.Color("#090a0e");
+  scene.fog = new THREE.Fog("#090a0e", 17, 32);
 
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
   camera.position.set(0, 10.5, -12.8);
@@ -30,8 +30,8 @@ export function createChessScene3D(host, onSquareClick) {
   controls.maxPolarAngle = Math.PI * 0.48;
   controls.target.set(0, 0.25, 0);
 
-  scene.add(new THREE.HemisphereLight(0xcce7ff, 0x382719, 2.0));
-  const keyLight = new THREE.DirectionalLight(0xffe2b5, 3.4);
+  scene.add(new THREE.HemisphereLight(0xffe8c4, 0x21130c, 2.25));
+  const keyLight = new THREE.DirectionalLight(0xffdfaa, 3.8);
   keyLight.position.set(-5, 10, 7);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(2048, 2048);
@@ -43,17 +43,17 @@ export function createChessScene3D(host, onSquareClick) {
   keyLight.shadow.camera.top = 7;
   keyLight.shadow.camera.bottom = -7;
   scene.add(keyLight);
-  const fillLight = new THREE.DirectionalLight(0xffffff, 1.15);
+  const fillLight = new THREE.DirectionalLight(0xfff1d6, 1.35);
   fillLight.position.set(6, 7, 4);
   scene.add(fillLight);
-  const rimLight = new THREE.PointLight(0x8edcff, 75, 18);
+  const rimLight = new THREE.PointLight(0xffd58a, 58, 19);
   rimLight.position.set(5, 5, -5);
   scene.add(rimLight);
-  const warmLight = new THREE.PointLight(0xffbd72, 42, 16);
+  const warmLight = new THREE.PointLight(0xc58a45, 52, 18);
   warmLight.position.set(-5, 3, 5);
   scene.add(warmLight);
 
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: "#101819", roughness: 0.88, metalness: 0.04 }));
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: "#0b0b0e", roughness: 0.78, metalness: 0.12 }));
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = -0.34;
   floor.receiveShadow = true;
@@ -64,9 +64,9 @@ export function createChessScene3D(host, onSquareClick) {
   const targetsGroup = new THREE.Group();
   scene.add(boardGroup, piecesGroup, targetsGroup);
 
-  const wood = new THREE.MeshStandardMaterial({ color: "#56331f", roughness: 0.32, metalness: 0.12 });
-  const lightSquare = new THREE.MeshStandardMaterial({ color: "#e8d2aa", roughness: 0.3, metalness: 0.04 });
-  const darkSquare = new THREE.MeshStandardMaterial({ color: "#70452b", roughness: 0.28, metalness: 0.08 });
+  const wood = new THREE.MeshStandardMaterial({ color: "#24170f", roughness: 0.24, metalness: 0.28 });
+  const lightSquare = new THREE.MeshStandardMaterial({ color: "#f0dfbd", roughness: 0.24, metalness: 0.08 });
+  const darkSquare = new THREE.MeshStandardMaterial({ color: "#49301f", roughness: 0.23, metalness: 0.16 });
   const highlight = new THREE.MeshStandardMaterial({ color: "#e8bd55", roughness: 0.28, emissive: "#8a5a12", emissiveIntensity: 0.3 });
   const lastHighlight = new THREE.MeshStandardMaterial({ color: "#bda04f", roughness: 0.32, emissive: "#6e5217", emissiveIntensity: 0.22 });
   const targetMat = new THREE.MeshBasicMaterial({ color: "#60d58b", transparent: true, opacity: 0.62, depthWrite: false });
@@ -96,7 +96,7 @@ export function createChessScene3D(host, onSquareClick) {
 
   const edge = new THREE.Mesh(
     new THREE.BoxGeometry(8.72, 0.12, 8.72),
-    new THREE.MeshStandardMaterial({ color: "#b17a43", metalness: 0.55, roughness: 0.24 })
+    new THREE.MeshStandardMaterial({ color: "#d6ad67", metalness: 0.82, roughness: 0.19 })
   );
   edge.position.y = -0.25;
   boardGroup.add(edge);
@@ -116,17 +116,17 @@ export function createChessScene3D(host, onSquareClick) {
     // Opaque, solid materials: avoid the glass-like look that made pieces
     // appear thin or transparent on some mobile GPUs.
     const glass = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#e8c995" : "#302019",
-      metalness: isWhite ? 0.06 : 0.12,
-      roughness: isWhite ? 0.3 : 0.26,
+      color: isWhite ? "#f4e2bd" : "#211712",
+      metalness: isWhite ? 0.12 : 0.2,
+      roughness: isWhite ? 0.22 : 0.2,
       transmission: 0,
       transparent: false,
       opacity: 1,
-      clearcoat: 0.9,
-      clearcoatRoughness: 0.12
+      clearcoat: 1,
+      clearcoatRoughness: 0.08
     });
     const metal = new THREE.MeshStandardMaterial({
-      color: "#d7ad58",
+      color: "#e7c477",
       metalness: 0.78,
       roughness: 0.2
     });
