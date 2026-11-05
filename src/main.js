@@ -1,5 +1,6 @@
 import chessPackage from "chess.js";
 import "./style.css";
+import { createChessScene3D } from "./scene3d.js";
 
 const Chess =
   chessPackage.Chess ||
@@ -55,6 +56,7 @@ let computerMoveToken = 0;
 // AI SETTINGS
 const MATE_SCORE = 100000;
 const AI_SEARCH_DEPTH = 3;
+const scene3d = createChessScene3D(boardElement, (name) => handleSquareClick(name));
 
 function showToast(message) {
   toastElement.textContent = message;
@@ -85,95 +87,10 @@ function findKing(color) {
 }
 
 function renderBoard() {
-  boardElement.innerHTML = "";
-
-  const rows = flipped
-    ? [1, 2, 3, 4, 5, 6, 7, 8]
-    : [8, 7, 6, 5, 4, 3, 2, 1];
-
-  const files = flipped
-    ? [7, 6, 5, 4, 3, 2, 1, 0]
-    : [0, 1, 2, 3, 4, 5, 6, 7];
-
-  const checkedKing = game.in_check()
-    ? findKing(game.turn())
-    : null;
-
+  const checkedKing = game.in_check() ? findKing(game.turn()) : null;
   const history = game.history({ verbose: true });
-
-  lastMove = history.length
-    ? history[history.length - 1]
-    : null;
-
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
-      const rank = rows[row];
-      const file = files[col];
-      const name = squareName(file, rank);
-      const piece = game.get(name);
-
-      const square = document.createElement("div");
-      square.className = "square";
-
-      const isLight = (file + rank) % 2 === 1;
-      square.classList.add(isLight ? "sq-light" : "sq-dark");
-
-      square.dataset.square = name;
-
-      if (selectedSquare === name) {
-        square.classList.add("selected");
-      }
-
-      if (
-        lastMove &&
-        (lastMove.from === name || lastMove.to === name)
-      ) {
-        square.classList.add("last-move");
-      }
-
-      if (checkedKing === name) {
-        square.classList.add("in-check");
-      }
-
-      if (legalTargets.includes(name)) {
-        square.classList.add(
-          piece ? "capture-target" : "move-target"
-        );
-      }
-
-      if (piece) {
-        const pieceElement = document.createElement("span");
-
-        pieceElement.className =
-          "piece " +
-          (piece.color === "w" ? "white-piece" : "black-piece");
-
-        pieceElement.textContent = glyphs[piece.color][piece.type];
-
-        square.appendChild(pieceElement);
-      }
-
-      if (col === 0) {
-        const rankLabel = document.createElement("span");
-        rankLabel.className = "coordinate rank-coordinate";
-        rankLabel.textContent = rank;
-        square.appendChild(rankLabel);
-      }
-
-      if (row === 7) {
-        const fileLabel = document.createElement("span");
-        fileLabel.className = "coordinate file-coordinate";
-        fileLabel.textContent = "abcdefgh"[file];
-        square.appendChild(fileLabel);
-      }
-
-      square.addEventListener("click", () => {
-        handleSquareClick(name);
-      });
-
-      boardElement.appendChild(square);
-    }
-  }
+  lastMove = history.length ? history[history.length - 1] : null;
+  scene3d.render(game, selectedSquare, legalTargets, lastMove, checkedKing, flipped);
 }
 
 function clearSelection() {
