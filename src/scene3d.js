@@ -228,6 +228,7 @@ export function createChessScene3D(host, onSquareClick) {
     if (hit) onSquareClick(hit.object.userData.square);
   });
 
+  let currentFlipped = null;
   function render(game, selectedSquare, legalTargets, lastMove, checkedKing, flipped) {
     piecesGroup.clear();
     pieceMeshes.length = 0;
@@ -251,10 +252,13 @@ export function createChessScene3D(host, onSquareClick) {
       dot.position.set(file-3.5,.315,4.5-rank);
       boardGroup.add(dot);
     }
-    camera.position.set(0, flipped ? 10.5 : 10.5, flipped ? -12.8 : 12.8);
-    camera.lookAt(0,.25,0);
-    controls.target.set(0,.25,0);
-    controls.update();
+    if (currentFlipped !== flipped) {
+      camera.position.set(0, 10.5, flipped ? -12.8 : 12.8);
+      camera.lookAt(0,.25,0);
+      controls.target.set(0,.25,0);
+      controls.update();
+      currentFlipped = flipped;
+    }
   }
 
   function animate() {
