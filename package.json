@@ -12,7 +12,8 @@
     "@capacitor/android": "6.2.0",
     "@capacitor/core": "6.2.0",
     "chess.js": "0.10.3",
-    "vite": "5.4.14"
+    "vite": "5.4.14",
+    "three": "^0.180.0"
   },
   "devDependencies": {
     "@capacitor/cli": "6.2.0"
