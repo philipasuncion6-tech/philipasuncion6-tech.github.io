@@ -101,6 +101,28 @@ export function createChessScene3D(host, onSquareClick) {
   edge.position.y = -0.25;
   boardGroup.add(edge);
 
+  // Four champagne-gold rails frame the playing surface like a handcrafted
+  // luxury table. They sit just outside the 8x8 tiles and stay non-interactive.
+  const frameMetal = new THREE.MeshStandardMaterial({
+    color: "#e5c27d",
+    metalness: 0.86,
+    roughness: 0.18
+  });
+  const railLong = new THREE.BoxGeometry(8.22, 0.055, 0.075);
+  const railShort = new THREE.BoxGeometry(0.075, 0.055, 8.22);
+  for (const z of [-4.12, 4.12]) {
+    const rail = new THREE.Mesh(railLong, frameMetal);
+    rail.position.set(0, 0.145, z);
+    rail.castShadow = true;
+    boardGroup.add(rail);
+  }
+  for (const x of [-4.12, 4.12]) {
+    const rail = new THREE.Mesh(railShort, frameMetal);
+    rail.position.set(x, 0.145, 0);
+    rail.castShadow = true;
+    boardGroup.add(rail);
+  }
+
   const profiles = {
     p: [[0,.02],[.28,.02],[.31,.08],[.25,.15],[.17,.2],[.14,.34],[.21,.43],[.24,.49],[.2,.57],[.13,.61],[.1,.72],[.04,.77],[0,.77]],
     r: [[0,.02],[.3,.02],[.32,.1],[.24,.17],[.2,.35],[.26,.4],[.26,.54],[.31,.56],[.31,.65],[.22,.65],[.22,.59],[.14,.59],[.14,.65],[.06,.65],[.06,.59],[0,.59]],
