@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 
 export function createChessScene3D(host, onSquareClick) {
   host.innerHTML = "";
@@ -18,8 +19,19 @@ export function createChessScene3D(host, onSquareClick) {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.2;
+  renderer.toneMappingExposure = 1.28;
+  renderer.transmissionResolutionScale = 1;
   host.appendChild(renderer.domElement);
+
+  // A real environment map gives the crystal surfaces something to refract
+  // and reflect; without it, transmissive pieces can look flat or papery.
+  const pmremGenerator = new THREE.PMREMGenerator(renderer);
+  pmremGenerator.compileEquirectangularShader();
+  const roomEnvironment = new RoomEnvironment();
+  const environmentTarget = pmremGenerator.fromScene(roomEnvironment, 0.04);
+  scene.environment = environmentTarget.texture;
+  roomEnvironment.dispose();
+  pmremGenerator.dispose();
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
@@ -138,20 +150,22 @@ export function createChessScene3D(host, onSquareClick) {
     // Faceted crystal chessmen: clear diamond/ice crystal for White
     // and deep ruby crystal for Black, with polished jewel-like reflections.
     const glass = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#dff7ff" : "#a80032",
-      metalness: 0.04,
-      roughness: 0.075,
-      transmission: 0.42,
-      thickness: 0.9,
+      color: isWhite ? "#e8fbff" : "#b00036",
+      metalness: 0.025,
+      roughness: 0.035,
+      transmission: 0.18,
+      thickness: 1.45,
       ior: 1.52,
       transparent: false,
       opacity: 1,
       clearcoat: 1,
-      clearcoatRoughness: 0.035,
-      attenuationColor: isWhite ? "#b9eaff" : "#72001f",
-      attenuationDistance: isWhite ? 2.2 : 1.15,
+      clearcoatRoughness: 0.018,
+      attenuationColor: isWhite ? "#d8f5ff" : "#8d0029",
+      attenuationDistance: isWhite ? 3.8 : 2.1,
       specularIntensity: 1,
-      envMapIntensity: 1.35
+      specularColor: isWhite ? "#ffffff" : "#ffd4e0",
+      envMapIntensity: 2.4,
+      flatShading: false
     });
     const metal = new THREE.MeshStandardMaterial({
       color: "#e7c477",
