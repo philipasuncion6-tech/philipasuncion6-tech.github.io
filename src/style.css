@@ -147,3 +147,196 @@ button { font: inherit; }
 }
 
 .chessboard.three-board-host { display: block; position: absolute; inset: 0; }
+
+
+/* =========================================
+   ASUNCION CHESS 3D — LUXURY SIGNATURE SKIN
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root {
+  color-scheme: dark;
+  font-family: "Manrope", "DM Sans", system-ui, sans-serif;
+  background: #08090d;
+  color: #f4eee2;
+  --gold: #e5c17d;
+  --muted: #a69b89;
+  --panel: #15141a;
+  --line: rgba(222, 187, 119, .24);
+  --champagne: #f0d69b;
+  --deep: #090a0e;
+}
+body {
+  background:
+    radial-gradient(ellipse at 50% -18%, rgba(183,137,67,.20), transparent 47%),
+    radial-gradient(ellipse at 100% 45%, rgba(65,49,34,.18), transparent 42%),
+    linear-gradient(145deg,#111016 0%,#08090d 58%,#15100c 100%);
+  color: #f4eee2;
+}
+#app { max-width: 1320px; }
+.topbar {
+  padding: 13px 0 25px;
+  border-bottom: 1px solid rgba(226,190,121,.3);
+  position: relative;
+}
+.topbar:after {
+  content:""; position:absolute; left:0; right:0; bottom:-1px; height:1px;
+  background:linear-gradient(90deg,transparent,#e8c982 48%,transparent);
+  opacity:.65;
+}
+.brand-mark {
+  width:54px;height:54px;border-radius:16px;
+  border:1px solid #c9a35e;
+  background:linear-gradient(145deg,#3b2c1c,#17141a 70%);
+  color:#f2d69b;
+  box-shadow:0 0 0 4px rgba(211,169,99,.06),0 12px 35px #000a,inset 0 1px #fff2;
+}
+.brand-copy h1 {
+  font-family:"Cinzel",Georgia,serif;
+  font-size:clamp(19px,2.2vw,27px);
+  letter-spacing:.11em;
+  color:#f4ead5;
+  text-shadow:0 2px 18px #d0a65a22;
+}
+.brand-copy h1 span { color:#e7c47e; }
+.eyebrow { color:#d2b477; letter-spacing:.24em; }
+.live-pill,.level-pill {
+  border-color:#80653b;
+  color:#e0c58d;
+  background:linear-gradient(135deg,#211b15aa,#111116aa);
+  box-shadow:inset 0 1px #fff1,0 5px 18px #0004;
+}
+.live-pill i { background:#b9d6a0;box-shadow:0 0 10px #b9d6a0; }
+.game-panel,.info-card,.tip-card {
+  background:linear-gradient(145deg,rgba(34,29,26,.97),rgba(15,15,20,.99) 68%);
+  border:1px solid rgba(213,177,111,.28);
+  border-radius:20px;
+  box-shadow:0 24px 65px #0008,inset 0 1px rgba(255,239,207,.055);
+}
+.game-panel { position:relative; overflow:hidden; }
+.game-panel:before,.info-card:before {
+  content:"";display:block;position:absolute;pointer-events:none;
+  inset:0;border-radius:inherit;
+  background:linear-gradient(125deg,rgba(255,229,176,.055),transparent 32%,transparent 70%,rgba(198,150,77,.035));
+}
+.game-heading h2,.promotion-box h3 {
+  font-family:"Cinzel",Georgia,serif;
+  letter-spacing:.035em;
+  color:#f2e5cb;
+}
+.level-pill { color:#f0d49a; }
+.avatar { border-radius:14px;box-shadow:0 5px 15px #0005,inset 0 1px #fff4; }
+.ai-avatar {
+  background:linear-gradient(145deg,#fff2d4,#b99b68);
+  color:#382719;
+  border:1px solid #e7ca8c;
+}
+.user-avatar {
+  background:linear-gradient(145deg,#4a3320,#171218);
+  color:#f0d18d;
+  border:1px solid #c29a57;
+}
+.turn-tag { border-color:#51483a;color:#b9aa8f; }
+.turn-tag.active {
+  border-color:#c39b57;color:#f3d89e;
+  background:linear-gradient(120deg,#75552a55,#3b2a1844);
+  box-shadow:0 0 16px #d5a95718;
+}
+.board-stage {
+  width:min(100%,640px);
+  padding:15px 15px 22px;
+  border:1px solid #c39a58;
+  border-radius:15px;
+  background:
+    linear-gradient(135deg,rgba(255,225,169,.16),transparent 18%,transparent 80%,rgba(255,220,158,.12)),
+    linear-gradient(145deg,#5b3b22,#1a1110 48%,#6a4727);
+  box-shadow:inset 0 1px 2px #fff5,inset 0 -9px 18px #000b,0 20px 38px #000b,0 0 0 4px #b88a4b18;
+}
+.board-stage:before {
+  inset:5px;border:1px solid #e3c17b88;border-radius:10px;
+  box-shadow:inset 0 0 0 2px #1b100b66;
+}
+.chessboard {
+  border:4px solid #d1ad6d;
+  border-radius:4px;
+  box-shadow:0 9px 22px #000b,inset 0 0 0 2px #fff4,0 0 0 1px #3b2617;
+}
+.sq-light { background:linear-gradient(145deg,#f3e6ca,#cbb58e); }
+.sq-dark { background:linear-gradient(145deg,#65452f,#352319); }
+.white-piece {
+  color:#fff7e6;
+  text-shadow:0 1px 0 #c7b99d,0 3px 1px #78664c,0 7px 8px #000b,-1px -1px 0 #fff;
+}
+.black-piece {
+  color:#241a14;
+  text-shadow:0 1px 0 #d4b77e,0 3px 2px #000,0 7px 7px #000c,-1px -1px 0 #e4c98d;
+}
+.status-card {
+  border-color:#9b784644;
+  background:linear-gradient(105deg,#30271c,#1b1919 55%,#20201d);
+  box-shadow:inset 0 1px #fff1,0 8px 20px #0003;
+}
+.status-icon { background:linear-gradient(145deg,#73532c55,#d3a85a22);color:#f0cf8b;border:1px solid #b58c4a55; }
+.controls { gap:9px; }
+.control-btn {
+  min-height:44px;
+  border:1px solid #716044;
+  border-radius:10px;
+  background:linear-gradient(145deg,#29251f,#17171b);
+  color:#eee3cf;
+  box-shadow:inset 0 1px #fff1,0 5px 14px #0003;
+  transition:transform .18s ease,border-color .18s ease,filter .18s ease,box-shadow .18s ease;
+}
+.control-btn:hover {
+  border-color:#d2ad6c;filter:brightness(1.12);
+  box-shadow:inset 0 1px #fff2,0 7px 20px #0005,0 0 15px #d4aa5b16;
+}
+.control-btn.primary {
+  background:linear-gradient(135deg,#f0d49a 0%,#c69a54 52%,#8f6736 100%);
+  border-color:#f1d59b;color:#24190e;
+  box-shadow:inset 0 1px #fff9,0 7px 20px #0005,0 0 18px #d6ad6522;
+}
+.control-btn.primary span { color:#4b3218; }
+.info-card { position:relative;overflow:hidden; }
+.card-title { color:#e6c98f; }
+.title-icon { color:#f0d49a; }
+.stat-line { border-top-color:#d9bd8a16; }
+.stat-line span { color:#b6aa98; }
+.stat-line strong { color:#f1e6d4; }
+.move-row { border-top-color:#d9bd8a18; }
+.white-notation { color:#fff1d5; }
+.black-notation { color:#e0bb78; }
+.tip-card {
+  background:linear-gradient(120deg,#342719,#19171a 70%);
+  border-color:#a17b435c;
+}
+.tip-card strong { color:#ebcd91; }
+.tip-card p { color:#c0b5a4; }
+.footer-note { color:#9b8d78;letter-spacing:.19em; }
+.footer-note span { color:#e2bd79; }
+.toast {
+  background:linear-gradient(135deg,#f0d49a,#bd8e4d);
+  color:#20160e;border:1px solid #f6dfae;
+}
+.promotion-modal { background:rgba(3,3,5,.82);backdrop-filter:blur(9px); }
+.promotion-box {
+  background:linear-gradient(145deg,#30271e,#151419);
+  border:1px solid #c8a15f;
+  box-shadow:0 25px 80px #000d,inset 0 1px #fff2,0 0 35px #c99c5120;
+}
+.promotion-box h3 { color:#f1dfbd; }
+.promotion-choice {
+  background:linear-gradient(145deg,#382b1d,#1b1919);
+  border-color:#8b6c40;color:#f5d99e;
+}
+.promotion-choice:hover { border-color:#efd18e;background:#4a3822; }
+.cancel-promotion { color:#d0c0a6; }
+.square:focus-visible { outline-color:#ffe3a0; }
+@media (prefers-reduced-motion:no-preference) {
+  .game-panel,.info-card,.tip-card { animation:luxuryReveal .55s ease both; }
+  @keyframes luxuryReveal { from { opacity:.82;transform:translateY(7px); } to { opacity:1;transform:translateY(0); } }
+}
+@media (max-width:760px) {
+  .topbar { padding-bottom:18px; }
+  .brand-mark { width:46px;height:46px; }
+}
