@@ -5,6 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#090a0e" />
     <meta name="description" content="ASUNCION CHESS 3D Luxury Edition — an elegant 3D chess experience in ebony, ivory and champagne gold." />
+    <!-- Pi Network SDK: sandbox mode is enabled only on the Pi Sandbox host. -->
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <script>
+      (() => {
+        const isPiSandbox = window.location.hostname === "sandbox.minepi.com";
+
+        try {
+          if (window.Pi && typeof window.Pi.init === "function") {
+            const initResult = window.Pi.init({
+              version: "2.0",
+              sandbox: isPiSandbox
+            });
+
+            if (initResult && typeof initResult.catch === "function") {
+              initResult.catch((error) => {
+                console.warn("Pi SDK initialization warning:", error);
+              });
+            }
+          }
+        } catch (error) {
+          console.warn("Pi SDK initialization warning:", error);
+        }
+      })();
+    </script>
     <title>ASUNCION CHESS 3D | Luxury Edition</title>
   </head>
   <body>
