@@ -885,3 +885,49 @@ body {
 @media (max-width:480px) {
   .brand-mark { box-shadow:0 0 0 3px #8dd8ff18,0 0 18px #69c9ff28,inset 0 1px #fff; }
 }
+
+
+/* ==========================================
+   PEARL ROYALE SIGNATURE — JEWELLERY HOUSE
+   ========================================== */
+:root {
+  --gold: #e6c27a;
+  --champagne: #f3e8cf;
+  --deep: #070b13;
+  --panel: #111722;
+  --line: rgba(225, 199, 143, .25);
+}
+body {
+  background:
+    radial-gradient(ellipse at 50% -12%, rgba(207,174,112,.17), transparent 43%),
+    radial-gradient(ellipse at 90% 38%, rgba(35,67,116,.16), transparent 42%),
+    linear-gradient(145deg,#111722 0%,#070a11 62%,#15131a 100%);
+}
+.brand-mark {
+  border-color:#e5d4ad;
+  background:linear-gradient(145deg,#f2ead9 0%,#b9a47c 42%,#252b35 100%);
+  color:#111722;
+  box-shadow:0 0 0 1px #fff4,0 12px 35px #000b,inset 0 1px #fff;
+}
+.brand-copy h1 { color:#f4efe4; text-shadow:0 2px 20px #e6c27a25; }
+.brand-copy h1 span,.eyebrow,.card-title,.title-icon { color:#e8ce98; }
+.game-panel,.info-card,.tip-card {
+  background:linear-gradient(145deg,rgba(29,34,43,.98),rgba(9,13,21,.99) 70%);
+  border-color:rgba(226,202,157,.32);
+  box-shadow:0 25px 70px #000a,inset 0 1px rgba(255,248,231,.08);
+}
+.board-stage {
+  border:1px solid #d8c79e;
+  border-radius:18px;
+  background:
+    radial-gradient(ellipse at 50% 10%,rgba(255,255,255,.12),transparent 58%),
+    linear-gradient(145deg,#30394a,#101722 58%,#26232a);
+  box-shadow:inset 0 1px 3px #fff4,inset 0 -12px 22px #000b,0 22px 48px #000c,0 0 0 3px #d8c79e16;
+}
+.status-card {
+  background:linear-gradient(110deg,#282b32,#121822 65%,#20212a);
+  border-color:#b99b654d;
+}
+.control-btn { border-color:#77694e;background:linear-gradient(145deg,#272b32,#121722); }
+.control-btn.primary { background:linear-gradient(135deg,#f1e4c5,#c9aa70 55%,#8f7045);border-color:#f6e8c8;color:#171820; }
+.footer-note { color:#c0b18e; }
