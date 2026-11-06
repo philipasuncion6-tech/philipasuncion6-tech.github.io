@@ -147,124 +147,31 @@ export function createChessScene3D(host, onSquareClick) {
   function makePiece(piece, square) {
     const group = new THREE.Group();
     const isWhite = piece.color === "w";
-    // Faceted crystal chessmen: clear diamond/ice crystal for White
-    // and deep ruby crystal for Black, with polished jewel-like reflections.
+    // Royal jewel palette: Computer (White) is emerald malachite;
+    // Player (Black) is luminous amber crystal. Gold trim is shared.
     const glass = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#e8fbff" : "#b00036",
-      metalness: 0.025,
-      roughness: 0.065,
-      transmission: 0.42,
-      thickness: 1.8,
+      color: isWhite ? "#075b43" : "#ff8a16",
+      metalness: isWhite ? 0.16 : 0.035,
+      roughness: isWhite ? 0.19 : 0.075,
+      transmission: isWhite ? 0.12 : 0.48,
+      thickness: 1.6,
       ior: 1.52,
       transparent: false,
       opacity: 1,
       clearcoat: 1,
-      clearcoatRoughness: 0.018,
-      attenuationColor: isWhite ? "#d8f5ff" : "#8d0029",
-      attenuationDistance: isWhite ? 3.8 : 2.1,
+      clearcoatRoughness: 0.035,
+      attenuationColor: isWhite ? "#063d32" : "#e65a08",
+      attenuationDistance: isWhite ? 2.8 : 2.2,
       specularIntensity: 1,
-      specularColor: isWhite ? "#ffffff" : "#ffd4e0",
-      envMapIntensity: 2.8,
+      specularColor: isWhite ? "#c7ffe6" : "#fff0c8",
+      envMapIntensity: 2.3,
       flatShading: true
     });
     const metal = new THREE.MeshStandardMaterial({
       color: "#e7c477",
-      metalness: 0.78,
-      roughness: 0.2
+      metalness: 0.84,
+      roughness: 0.18
     });
-    const stem = new THREE.Mesh(new THREE.LatheGeometry(
-      profiles[piece.type].map(([r,y]) => new THREE.Vector2(r,y)), 10
-    ), glass);
-    stem.castShadow = true;
-    stem.receiveShadow = true;
-    group.add(stem);
-
-    const foot = new THREE.Mesh(new THREE.CylinderGeometry(.29,.32,.09,48), metal);
-    foot.position.y = .065;
-    foot.castShadow = true;
-    group.add(foot);
-    const collar = new THREE.Mesh(
-      new THREE.TorusGeometry(.235,.025,12,48),
-      metal
-    );
-    collar.rotation.x = Math.PI / 2;
-    collar.position.y = .19;
-    collar.castShadow = true;
-    group.add(collar);
-
-    // Fine gold inlay bands add a turned-wood, handcrafted finish.
-    for (const [radius, tube, y] of [[.255,.012,.115],[.205,.009,.285]]) {
-      const inlay = new THREE.Mesh(new THREE.TorusGeometry(radius,tube,10,48), metal);
-      inlay.rotation.x = Math.PI / 2;
-      inlay.position.y = y;
-      inlay.castShadow = true;
-      inlay.receiveShadow = true;
-      group.add(inlay);
-    }
-
-    if (piece.type === "p") {
-      const head = new THREE.Mesh(new THREE.IcosahedronGeometry(.12, 0), glass);
-      head.position.y = .79;
-      head.castShadow = true;
-      group.add(head);
-    } else if (piece.type === "n") {
-      const horse = new THREE.Group();
-      const neck = new THREE.Mesh(new THREE.CapsuleGeometry(.12,.28,2,6), glass);
-      neck.position.set(0,.72,0);
-      neck.rotation.z = -.32;
-      horse.add(neck);
-      const head = new THREE.Mesh(new THREE.IcosahedronGeometry(.16, 0), glass);
-      head.position.set(.02,.91,.01);
-      horse.add(head);
-      const muzzle = new THREE.Mesh(new THREE.ConeGeometry(.09,.22,6), glass);
-      muzzle.position.set(.12,.91,.02);
-      muzzle.rotation.z = -Math.PI/2;
-      horse.add(muzzle);
-      const ear = new THREE.Mesh(new THREE.ConeGeometry(.055,.2,5), glass);
-      ear.position.set(-.06,1.08,0);
-      horse.add(ear);
-      horse.rotation.y = Math.PI / 2;
-      group.add(horse);
-    } else if (piece.type === "b") {
-      const orb = new THREE.Mesh(new THREE.IcosahedronGeometry(.135, 0), glass);
-      orb.position.y = .82;
-      group.add(orb);
-      const tip = new THREE.Mesh(new THREE.ConeGeometry(.09,.2,24), metal);
-      tip.position.y = .98;
-      group.add(tip);
-      const cut = new THREE.Mesh(new THREE.BoxGeometry(.025,.22,.28), metal);
-      cut.position.set(0,.78,0);
-      cut.rotation.z = .55;
-      group.add(cut);
-    } else if (piece.type === "q") {
-      const crown = new THREE.Mesh(new THREE.IcosahedronGeometry(.17, 0), glass);
-      crown.position.y = .84;
-      group.add(crown);
-      for (let i=0;i<5;i++) {
-        const a = i * Math.PI * 2 / 5;
-        const jewel = new THREE.Mesh(new THREE.SphereGeometry(.055,18,14), metal);
-        jewel.position.set(Math.cos(a)*.19, .91, Math.sin(a)*.19);
-        group.add(jewel);
-      }
-    } else if (piece.type === "k") {
-      const orb = new THREE.Mesh(new THREE.SphereGeometry(.12,28,20), glass);
-      orb.position.y = .86;
-      group.add(orb);
-      const vertical = new THREE.Mesh(new THREE.BoxGeometry(.075,.34,.075), metal);
-      vertical.position.y = 1.08;
-      group.add(vertical);
-      const cross = new THREE.Mesh(new THREE.BoxGeometry(.25,.07,.075), metal);
-      cross.position.y = 1.13;
-      group.add(cross);
-    } else if (piece.type === "r") {
-      for (let i=0;i<4;i++) {
-        const crenel = new THREE.Mesh(new THREE.BoxGeometry(.12,.13,.12), metal);
-        const a = i * Math.PI/2;
-        crenel.position.set(Math.cos(a)*.19,.68,Math.sin(a)*.19);
-        group.add(crenel);
-      }
-    }
-
     const [file, rank] = ["abcdefgh".indexOf(square[0]), Number(square[1])];
     group.position.set(file - 3.5, .30, 4.5 - rank);
     group.userData.square = square;
