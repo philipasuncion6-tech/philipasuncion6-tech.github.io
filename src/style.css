@@ -4,21 +4,21 @@
 :root {
   color-scheme: dark;
   font-family: "DM Sans", system-ui, sans-serif;
-  background: #0c151a;
+  background: #17131b;
   color: #edf1ef;
   font-synthesis: none;
-  --gold: #d7aa63;
-  --muted: #91a0a4;
-  --panel: #142229;
-  --line: rgba(221, 190, 139, .15);
+  --gold: #e6c27a;
+  --muted: #c3b8a8;
+  --panel: #211c23;
+  --line: rgba(230, 194, 122, .28);
 }
 * { box-sizing: border-box; }
 html, body, #app { min-height: 100%; margin: 0; }
 body {
   min-height: 100vh;
   background:
-    radial-gradient(ellipse at 50% -20%, rgba(69, 105, 103, .25), transparent 55%),
-    linear-gradient(145deg, #101d23, #091116 70%);
+    radial-gradient(ellipse at 50% -20%, rgba(210, 174, 120, .19), transparent 58%),
+    linear-gradient(145deg, #241d24, #100e14 72%);
   color: #edf1ef;
 }
 button { font: inherit; }
