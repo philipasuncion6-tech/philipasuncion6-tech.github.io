@@ -7,8 +7,8 @@ export function createChessScene3D(host, onSquareClick) {
   host.classList.add("three-board-host");
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color("#030817");
-  scene.fog = new THREE.Fog("#030817", 20, 38);
+  scene.background = new THREE.Color("#17131b");
+  scene.fog = new THREE.Fog("#17131b", 22, 42);
 
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
   camera.position.set(0, 10.5, 12.8);
@@ -32,6 +32,7 @@ export function createChessScene3D(host, onSquareClick) {
   const roomEnvironment = new RoomEnvironment();
   const environmentTarget = pmremGenerator.fromScene(roomEnvironment, 0.04);
   scene.environment = environmentTarget.texture;
+  scene.environmentIntensity = 1.35;
   roomEnvironment.dispose();
   pmremGenerator.dispose();
 
@@ -44,8 +45,8 @@ export function createChessScene3D(host, onSquareClick) {
   controls.maxPolarAngle = Math.PI * 0.48;
   controls.target.set(0, 0.25, 0);
 
-  scene.add(new THREE.HemisphereLight(0xfff8ed, 0x111827, 2.0));
-  const keyLight = new THREE.DirectionalLight(0xffffff, 4.4);
+  scene.add(new THREE.HemisphereLight(0xfff8ed, 0x3b3030, 2.5));
+  const keyLight = new THREE.DirectionalLight(0xfff4df, 5.2);
   keyLight.position.set(-5, 10, 7);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(1024, 1024);
@@ -57,17 +58,17 @@ export function createChessScene3D(host, onSquareClick) {
   keyLight.shadow.camera.top = 7;
   keyLight.shadow.camera.bottom = -7;
   scene.add(keyLight);
-  const fillLight = new THREE.DirectionalLight(0xd9e8ff, 2.3);
+  const fillLight = new THREE.DirectionalLight(0xdce8ff, 3.0);
   fillLight.position.set(6, 7, 4);
   scene.add(fillLight);
-  const rimLight = new THREE.PointLight(0xffffff, 72, 24);
+  const rimLight = new THREE.PointLight(0xffffff, 88, 28);
   rimLight.position.set(5, 5, -5);
   scene.add(rimLight);
-  const warmLight = new THREE.PointLight(0xd7b36b, 46, 22);
+  const warmLight = new THREE.PointLight(0xf0c879, 58, 26);
   warmLight.position.set(-5, 3, 5);
   scene.add(warmLight);
 
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: "#050b1c", roughness: 0.38, metalness: 0.42 }));
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: "#211b20", roughness: 0.28, metalness: 0.32 }));
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = -0.34;
   floor.receiveShadow = true;
@@ -78,9 +79,9 @@ export function createChessScene3D(host, onSquareClick) {
   const targetsGroup = new THREE.Group();
   scene.add(boardGroup, piecesGroup, targetsGroup);
 
-  const wood = new THREE.MeshPhysicalMaterial({ color: "#11151d", roughness: 0.2, metalness: 0.88, clearcoat: 1, clearcoatRoughness: 0.08 });
-  const lightSquare = new THREE.MeshPhysicalMaterial({ color: "#f4f1e9", roughness: 0.16, metalness: 0.12, clearcoat: 1, clearcoatRoughness: 0.06, iridescence: 0.12, iridescenceIOR: 1.3, iridescenceThicknessRange: [220, 420] });
-  const darkSquare = new THREE.MeshPhysicalMaterial({ color: "#111a2a", roughness: 0.13, metalness: 0.72, emissive: "#071326", emissiveIntensity: 0.05, clearcoat: 1, clearcoatRoughness: 0.04 });
+  const wood = new THREE.MeshPhysicalMaterial({ color: "#d8c7a7", roughness: 0.19, metalness: 0.72, clearcoat: 1, clearcoatRoughness: 0.045 });
+  const lightSquare = new THREE.MeshPhysicalMaterial({ color: "#fff4dc", roughness: 0.12, metalness: 0.08, clearcoat: 1, clearcoatRoughness: 0.035, iridescence: 0.32, iridescenceIOR: 1.35, iridescenceThicknessRange: [280, 620] });
+  const darkSquare = new THREE.MeshPhysicalMaterial({ color: "#111018", roughness: 0.09, metalness: 0.82, emissive: "#24172a", emissiveIntensity: 0.07, clearcoat: 1, clearcoatRoughness: 0.025 });
   const highlight = new THREE.MeshStandardMaterial({ color: "#e8fbff", roughness: 0.12, metalness: 0.2, emissive: "#4ebfff", emissiveIntensity: 0.42 });
   const lastHighlight = new THREE.MeshStandardMaterial({ color: "#91e7ff", roughness: 0.14, metalness: 0.24, emissive: "#286caa", emissiveIntensity: 0.34 });
   const targetMat = new THREE.MeshBasicMaterial({ color: "#60d58b", transparent: true, opacity: 0.62, depthWrite: false });
@@ -169,16 +170,16 @@ export function createChessScene3D(host, onSquareClick) {
     // Pearl Royale interpretation: rhodium-finished white gold, pavé diamonds,
     // white/black South-Sea-style pearl heads and restrained Ceylon sapphire accents.
     const bodyMetal = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#f4f1e9" : "#667184",
+      color: isWhite ? "#fff8e9" : "#171923",
       metalness: 1,
       roughness: 0.145,
       clearcoat: 1,
       clearcoatRoughness: 0.055,
       envMapIntensity: 2.2
     });
-    const brightGold = new THREE.MeshStandardMaterial({ color: "#e6c27a", metalness: 1, roughness: 0.16 });
-    const whiteGold = new THREE.MeshStandardMaterial({ color: "#f1eee7", metalness: 1, roughness: 0.12 });
-    const shadowMetal = new THREE.MeshStandardMaterial({ color: "#39475c", metalness: 1, roughness: 0.18 });
+    const brightGold = new THREE.MeshStandardMaterial({ color: "#e7bd70", metalness: 1, roughness: 0.11 });
+    const whiteGold = new THREE.MeshStandardMaterial({ color: "#fffdf5", metalness: 1, roughness: 0.075 });
+    const shadowMetal = new THREE.MeshStandardMaterial({ color: "#8b6d48", metalness: 1, roughness: 0.13 });
     const sapphire = new THREE.MeshPhysicalMaterial({
       color: "#164b9a", metalness: 0.12, roughness: 0.08,
       transmission: 0.18, thickness: 1.2, ior: 1.76,
@@ -192,10 +193,10 @@ export function createChessScene3D(host, onSquareClick) {
       envMapIntensity: 3
     });
     const pearl = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#fff9ec" : "#20242d",
-      metalness: 0.12, roughness: 0.19,
+      color: isWhite ? "#fff7e8" : "#090b13",
+      metalness: 0.08, roughness: 0.14,
       clearcoat: 1, clearcoatRoughness: 0.08,
-      iridescence: 0.32, iridescenceIOR: 1.45,
+      iridescence: 0.55, iridescenceIOR: 1.48,
       iridescenceThicknessRange: [260, 520],
       envMapIntensity: 2.1
     });
@@ -339,7 +340,7 @@ export function createChessScene3D(host, onSquareClick) {
     // Tiny Ceylon-blue stones punctuate the white-gold regalia.
     if (piece.type !== "k" && piece.type !== "q") addSapphireBand(.205,.235,8);
     const [file, rank] = ["abcdefgh".indexOf(square[0]), Number(square[1])];
-    group.scale.setScalar(1.12);
+    group.scale.setScalar(1.18);
     group.position.set(file - 3.5, .30, 4.5 - rank);
     group.userData.square = square;
     group.traverse(obj => {
