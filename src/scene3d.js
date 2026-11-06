@@ -219,17 +219,33 @@ export function createChessScene3D(host, onSquareClick) {
     const addPearl = (radius, y, material=pearl) =>
       addMesh(new THREE.SphereGeometry(radius, 32, 24), material, 0, y, 0);
     const addPave = (radius, y, count=16, gemMaterial=diamond, size=0.026) => {
-      for (let i=0;i<count;i++) {
-        const a=(i/count)*Math.PI*2;
-        const gem=addMesh(new THREE.OctahedronGeometry(size,0),gemMaterial,Math.cos(a)*radius,y,Math.sin(a)*radius);
-        gem.rotation.set(0,a,Math.PI/4);
-      }
-    };
-    const addSapphireBand = (radius,y,count=8) => {
+      const geometry = new THREE.OctahedronGeometry(size,0);
+      const stones = new THREE.InstancedMesh(geometry,gemMaterial,count);
+      const dummy = new THREE.Object3D();
       for(let i=0;i<count;i++){
         const a=(i/count)*Math.PI*2;
-        addMesh(new THREE.OctahedronGeometry(0.035,0),sapphire,Math.cos(a)*radius,y,Math.sin(a)*radius);
+        dummy.position.set(Math.cos(a)*radius,y,Math.sin(a)*radius);
+        dummy.rotation.set(0,a,Math.PI/4);
+        dummy.updateMatrix();
+        stones.setMatrixAt(i,dummy.matrix);
       }
+      stones.instanceMatrix.needsUpdate=true;
+      stones.castShadow=true;
+      group.add(stones);
+    };
+    const addSapphireBand = (radius,y,count=8) => {
+      const stones = new THREE.InstancedMesh(new THREE.OctahedronGeometry(.035,0),sapphire,count);
+      const dummy = new THREE.Object3D();
+      for(let i=0;i<count;i++){
+        const a=(i/count)*Math.PI*2;
+        dummy.position.set(Math.cos(a)*radius,y,Math.sin(a)*radius);
+        dummy.rotation.set(0,a,Math.PI/4);
+        dummy.updateMatrix();
+        stones.setMatrixAt(i,dummy.matrix);
+      }
+      stones.instanceMatrix.needsUpdate=true;
+      stones.castShadow=true;
+      group.add(stones);
     };
 
     // Sculpted Staunton-inspired turned body, now rendered as precious metal.
@@ -255,7 +271,7 @@ export function createChessScene3D(host, onSquareClick) {
     addPave(.248,.195,20,diamond,.018);
 
     // Jewelled collar: small stones are individually set, not painted on.
-    const collarY = piece.type==="p"?.43:piece.type==="n"?.43:.49;
+    const collarY = piece.type === "p" ? 0.43 : piece.type === "n" ? 0.43 : 0.49;
     addRing(.19,.018,collarY,brightGold);
     addPave(.19,collarY,16,diamond,.021);
     addSapphireBand(.176,collarY+.035,8);
@@ -266,8 +282,8 @@ export function createChessScene3D(host, onSquareClick) {
       addPave(.145,.77,16,diamond,.022);
       addPearl(.145,.91);
       // A fine white-gold cross crowns the king's pearl.
-      addMesh(new THREE.BoxGeometry(.055,.24,.055),whiteGold,0,1.105,0);
-      addMesh(new THREE.BoxGeometry(.20,.055,.055),brightGold,0,1.13,0);
+      addMesh(new THREE.BoxGeometry(.055,.20,.055),whiteGold,0,1.15,0);
+      addMesh(new THREE.BoxGeometry(.20,.055,.055),brightGold,0,1.18,0);
       addSapphireBand(.14,.79,8);
     } else if (piece.type === "q") {
       addCylinder(.145,.18,.065,.70,brightGold);
