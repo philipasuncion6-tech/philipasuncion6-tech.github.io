@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 
 export function createChessScene3D(host, onSquareClick) {
   host.innerHTML = "";
@@ -20,30 +19,11 @@ export function createChessScene3D(host, onSquareClick) {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.88;
+  renderer.toneMapping = THREE.NoToneMapping;
   renderer.transmissionResolutionScale = 1;
   host.appendChild(renderer.domElement);
 
-  // Environment reflections enrich the precious materials, but PMREM shader
-  // compilation can fail on some Android/WebView GPUs. Keep the real 3D scene
-  // alive with its studio lights even when that optional reflection map fails.
-  let environmentTarget = null;
-  let roomEnvironment = null;
-  let pmremGenerator = null;
-  try {
-    pmremGenerator = new THREE.PMREMGenerator(renderer);
-    pmremGenerator.compileEquirectangularShader();
-    roomEnvironment = new RoomEnvironment();
-    environmentTarget = pmremGenerator.fromScene(roomEnvironment, 0.04);
-    scene.environment = environmentTarget.texture;
-    scene.environmentIntensity = 0.62;
-  } catch (error) {
-    console.warn("Optional environment reflections unavailable; continuing with lit 3D materials.", error);
-  } finally {
-    roomEnvironment?.dispose();
-    pmremGenerator?.dispose();
-  }
+  // Deliberately disable generated studio reflections: they caused a milky, smoky veil on Android WebView.\n  scene.environment = null;
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
@@ -169,20 +149,20 @@ export function createChessScene3D(host, onSquareClick) {
   }
   const pearlMap = makeSurfaceTexture("pearl");
   const obsidianMap = makeSurfaceTexture("obsidian");
-  const wood = new THREE.MeshPhysicalMaterial({ color: "#b58a4d", roughness: 0.24, metalness: 0.92, clearcoat: 1, clearcoatRoughness: 0.12 });
+  const wood = new THREE.MeshPhysicalMaterial({ color: "#b58a4d", roughness: 0.42, metalness: 0.72, clearcoat: 0, clearcoatRoughness: 1 });
   const lightSquare = new THREE.MeshPhysicalMaterial({
-    color: "#fff8e9", map: pearlMap, roughness: 0.19, metalness: 0.08,
-    clearcoat: 1, clearcoatRoughness: 0.09, iridescence: 1,
+    color: "#fff8e9", map: pearlMap, roughness: 0.48, metalness: 0.04,
+    clearcoat: 0, clearcoatRoughness: 1, iridescence: 0,
     iridescenceIOR: 1.42, iridescenceThicknessRange: [360, 820],
-    specularIntensity: 0.8, envMapIntensity: 1.35
+    specularIntensity: 0.8, envMapIntensity: 0
   });
   const darkSquare = new THREE.MeshPhysicalMaterial({
-    color: "#101522", map: obsidianMap, roughness: 0.12, metalness: 0.3,
+    color: "#101522", map: obsidianMap, roughness: 0.52, metalness: 0.12,
     emissive: "#07101e", emissiveIntensity: 0.035,
-    clearcoat: 1, clearcoatRoughness: 0.11, envMapIntensity: 1.6
+    clearcoat: 0, clearcoatRoughness: 1, envMapIntensity: 0
   });
   const highlight = new THREE.MeshStandardMaterial({ color: "#e8fbff", roughness: 0.12, metalness: 0.2, emissive: "#4ebfff", emissiveIntensity: 0.42 });
-  const lastHighlight = new THREE.MeshStandardMaterial({ color: "#91e7ff", roughness: 0.14, metalness: 0.24, emissive: "#286caa", emissiveIntensity: 0.34 });
+  const lastHighlight = new THREE.MeshStandardMaterial({ color: "#91e7ff", roughness: 0.42, metalness: 0.24, emissive: "#286caa", emissiveIntensity: 0.34 });
   const targetMat = new THREE.MeshBasicMaterial({ color: "#60d58b", transparent: true, opacity: 0.62, depthWrite: false });
   const checkedSquare = new THREE.MeshStandardMaterial({ color: "#b43a32", emissive: "#8f160d", emissiveIntensity: .55 });
 
@@ -211,7 +191,7 @@ export function createChessScene3D(host, onSquareClick) {
   // Layered white-gold / champagne-gold plinth with a visible polished bevel.
   const edge = new THREE.Mesh(
     new THREE.BoxGeometry(8.78, 0.16, 8.78),
-    new THREE.MeshPhysicalMaterial({ color: "#d5b36d", metalness: 1, roughness: 0.16, clearcoat: 1, clearcoatRoughness: 0.1 })
+    new THREE.MeshPhysicalMaterial({ color: "#d5b36d", metalness: 1, roughness: 0.16, clearcoat: 0, clearcoatRoughness: 0.1 })
   );
   edge.position.y = -0.25;
   edge.castShadow = true;
@@ -226,7 +206,7 @@ export function createChessScene3D(host, onSquareClick) {
   // Double gold inlay rails create a real jeweller's frame around the board.
   const frameMetal = new THREE.MeshPhysicalMaterial({
     color: "#f2d28c", metalness: 1, roughness: 0.13,
-    clearcoat: 1, clearcoatRoughness: 0.08
+    clearcoat: 0, clearcoatRoughness: 1
   });
   const railLong = new THREE.BoxGeometry(8.22, 0.055, 0.075);
   const railShort = new THREE.BoxGeometry(0.075, 0.055, 8.22);
@@ -245,11 +225,11 @@ export function createChessScene3D(host, onSquareClick) {
 
   // Ceylon-blue sapphire cabochons are bezel-set into all four frame corners.
   const cornerSapphire = new THREE.MeshPhysicalMaterial({
-    color: "#1452b4", metalness: .08, roughness: .075, transmission: .24,
-    thickness: 1.1, ior: 1.76, clearcoat: 1, clearcoatRoughness: .025,
-    envMapIntensity: 2.2
+    color: "#1452b4", metalness: .08, roughness: .4, transmission: .24,
+    thickness: 1.1, ior: 1.76, clearcoat: 0, clearcoatRoughness: .025,
+    envMapIntensity: 0
   });
-  const cornerDiamond = new THREE.MeshPhysicalMaterial({ color: "#ffffff", roughness: .025, metalness: .02, transmission: .2, ior: 2.2, clearcoat: 1 });
+  const cornerDiamond = new THREE.MeshPhysicalMaterial({ color: "#ffffff", roughness: .025, metalness: .02, transmission: .2, ior: 2.2, clearcoat: 0 });
   for (const x of [-4.02, 4.02]) for (const z of [-4.02, 4.02]) {
     const mount = new THREE.Mesh(new THREE.CylinderGeometry(.18,.21,.075,48), frameMetal);
     mount.position.set(x,.22,z);
@@ -301,33 +281,33 @@ export function createChessScene3D(host, onSquareClick) {
     const bodyMetal = new THREE.MeshPhysicalMaterial({
       color: isWhite ? "#fff8e9" : "#171923",
       metalness: 1,
-      roughness: 0.145,
-      clearcoat: 1,
-      clearcoatRoughness: 0.055,
-      envMapIntensity: 2.2
+      roughness: 0.42,
+      clearcoat: 0,
+      clearcoatRoughness: 1,
+      envMapIntensity: 0
     });
     const brightGold = new THREE.MeshStandardMaterial({ color: "#e7bd70", metalness: 1, roughness: 0.11 });
     const whiteGold = new THREE.MeshStandardMaterial({ color: "#fffdf5", metalness: 1, roughness: 0.075 });
     const shadowMetal = new THREE.MeshStandardMaterial({ color: "#8b6d48", metalness: 1, roughness: 0.13 });
     const sapphire = new THREE.MeshPhysicalMaterial({
-      color: "#164b9a", metalness: 0.12, roughness: 0.08,
+      color: "#164b9a", metalness: 0.12, roughness: 0.4,
       transmission: 0.18, thickness: 1.2, ior: 1.76,
-      clearcoat: 1, clearcoatRoughness: 0.025,
-      envMapIntensity: 2.4
+      clearcoat: 0, clearcoatRoughness: 1,
+      envMapIntensity: 0
     });
     const diamond = new THREE.MeshPhysicalMaterial({
-      color: "#ffffff", metalness: 0.02, roughness: 0.035,
+      color: "#ffffff", metalness: 0.02, roughness: 0.32,
       transmission: 0.28, thickness: 0.7, ior: 2.35,
-      clearcoat: 1, clearcoatRoughness: 0.015,
-      envMapIntensity: 3
+      clearcoat: 0, clearcoatRoughness: 1,
+      envMapIntensity: 0
     });
     const pearl = new THREE.MeshPhysicalMaterial({
       color: isWhite ? "#fff7e8" : "#090b13",
       metalness: 0.08, roughness: 0.14,
-      clearcoat: 1, clearcoatRoughness: 0.08,
-      iridescence: 0.55, iridescenceIOR: 1.48,
+      clearcoat: 0, clearcoatRoughness: 1,
+      iridescence: 0, iridescenceIOR: 1.48,
       iridescenceThicknessRange: [260, 520],
-      envMapIntensity: 2.1
+      envMapIntensity: 0
     });
     const trim = isWhite ? whiteGold : shadowMetal;
 
