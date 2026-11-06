@@ -551,3 +551,69 @@ body {
 @media (max-width: 760px) {
   .board-stage { width: 100%; min-height: 280px; }
 }
+
+
+/* ROYAL CHESS — DIAMOND EDITION */
+:root {
+  color-scheme: dark;
+  --gold: #d9efff;
+  --line: rgba(153, 211, 255, .28);
+}
+html, body { background-color: #070d19; }
+body {
+  background:
+    radial-gradient(ellipse at 50% -12%, rgba(73,154,214,.25), transparent 48%),
+    radial-gradient(ellipse at 92% 42%, rgba(94,89,202,.16), transparent 38%),
+    linear-gradient(145deg,#101d35 0%,#070d19 58%,#11152b 100%);
+}
+.topbar { border-bottom-color: rgba(174,222,255,.35); }
+.topbar:after { background:linear-gradient(90deg,transparent,#d9f5ff 48%,transparent); }
+.brand-mark {
+  background:linear-gradient(145deg,#25466b,#101a32 70%,#090e1b);
+  border-color:#b9eaff;color:#e8faff;
+  box-shadow:0 0 0 4px #8bdcff18,0 12px 35px #000b,inset 0 1px #fff8;
+}
+.brand-copy h1,.game-heading h2,.promotion-box h3 { color:#edf8ff; }
+.brand-copy h1 span { color:#a9e5ff; }
+.eyebrow,.card-title,.title-icon { color:#b8e8ff; }
+.live-pill,.level-pill { border-color:#6da8d1;color:#d8f4ff;background:linear-gradient(135deg,#172b48,#10182b); }
+.game-panel,.info-card,.tip-card {
+  background:linear-gradient(145deg,rgba(24,39,66,.97),rgba(10,16,31,.99) 72%);
+  border-color:rgba(143,207,255,.35);
+  box-shadow:0 24px 65px #0009,inset 0 1px rgba(235,250,255,.1);
+}
+.game-panel:before,.info-card:before {
+  background:linear-gradient(125deg,rgba(214,245,255,.09),transparent 34%,transparent 70%,rgba(102,161,255,.07));
+}
+.ai-avatar { background:linear-gradient(145deg,#fff,#9bc9e7);color:#17304c;border:1px solid #d9f5ff; }
+.user-avatar { background:linear-gradient(145deg,#263f77,#11172e);border:1px solid #8ebfff;color:#d9eaff; }
+.turn-tag.active { border-color:#a7e8ff;color:#e2f8ff;background:#6bcfff22;box-shadow:0 0 18px #73d9ff22; }
+.board-stage {
+  border:1px solid #bdeeff;
+  background:
+    linear-gradient(135deg,rgba(226,248,255,.16),transparent 20%,transparent 80%,rgba(116,184,255,.13)),
+    linear-gradient(145deg,#315b85,#111b35 48%,#426c9c);
+  box-shadow:inset 0 1px 3px #fff8,inset 0 -9px 18px #000b,0 20px 38px #000b,0 0 0 4px #7ddcff20;
+}
+.board-stage:before { border-color:#d9f5ff99; }
+.status-card { border-color:#8acfff55;background:linear-gradient(105deg,#1c3b5b,#111c36 60%,#1d2450); }
+.status-icon { background:#8bdcff22;border:1px solid #9de7ff66;color:#e5faff; }
+.control-btn { border-color:#658cb5;background:linear-gradient(145deg,#1e3555,#111a30);color:#e8f7ff; }
+.control-btn span { color:#b9edff; }
+.control-btn.primary {
+  color:#10243b;border-color:#e2f8ff;
+  background:linear-gradient(135deg,#f4fdff,#a9ddf4 52%,#679bc9);
+  box-shadow:inset 0 1px #fff,0 8px 22px #0006,0 0 20px #8bdcff33;
+}
+.info-card,.tip-card { border-color:#78b5e655;background:linear-gradient(145deg,#1a2c4c,#101629 72%); }
+.stat-line span,.tip-card p { color:#b6cde0; }
+.stat-line strong,.status-copy strong { color:#effaff; }
+.white-notation { color:#f1fbff; }
+.black-notation { color:#a9dfff; }
+.tip-card { background:linear-gradient(120deg,#213d60,#111a31 78%); }
+.tip-card strong { color:#c4edff; }
+.footer-note { color:#a4c5df; }
+.footer-note span { color:#c9f2ff; }
+.promotion-box { background:linear-gradient(145deg,#1e3658,#101629);border-color:#a9e6ff; }
+.promotion-choice { background:linear-gradient(145deg,#25456a,#111b32);border-color:#75bce8;color:#e5f8ff; }
+.toast { background:linear-gradient(135deg,#e7faff,#91c9ee);color:#10243b;border-color:#fff; }
