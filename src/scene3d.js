@@ -154,17 +154,19 @@ export function createChessScene3D(host, onSquareClick) {
     // player (Black). Rich saturated color and crisp facets keep the gems
     // readable on a phone instead of washing out like pale glass.
     const crystal = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#00d889" : "#e50946",
-      metalness: 0.08,
-      roughness: 0.11,
-      transmission: 0.24,
-      thickness: 2.4,
+      color: isWhite ? "#00a84f" : "#c90032",
+      metalness: 0.12,
+      roughness: 0.16,
+      transmission: 0.055,
+      thickness: 1.7,
       ior: isWhite ? 1.58 : 1.76,
       clearcoat: 1,
-      clearcoatRoughness: 0.018,
-      attenuationColor: isWhite ? "#00a85e" : "#a9002b",
-      attenuationDistance: isWhite ? 2.1 : 1.8,
-      envMapIntensity: 2.8,
+      clearcoatRoughness: 0.035,
+      attenuationColor: isWhite ? "#007b39" : "#8e001f",
+      attenuationDistance: isWhite ? 0.95 : 0.9,
+      envMapIntensity: 1.75,
+      emissive: isWhite ? "#003b1c" : "#45000e",
+      emissiveIntensity: 0.16,
       flatShading: true
     });
     const gold = new THREE.MeshStandardMaterial({
