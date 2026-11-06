@@ -25,7 +25,7 @@
               <div class="eyebrow">CLASSIC MODE</div>
               <h2>Play vs Computer</h2>
             </div>
-            <div class="level-pill">AI • STANDARD</div>
+            <label class="difficulty-control" for="difficulty-select">AI LEVEL <select id="difficulty-select" aria-label="Computer difficulty"><option value="2">Easy</option><option value="3" selected>Medium</option><option value="4">Hard</option></select></label>
           </div>
 
           <div class="player-row opponent-row">
@@ -64,6 +64,7 @@
             <button class="control-btn primary" id="new-game"><span>↻</span> New Game</button>
             <button class="control-btn" id="undo"><span>↶</span> Undo</button>
             <button class="control-btn" id="flip"><span>⇅</span> Flip Board</button>
+            <button class="control-btn sound-control" id="sound-toggle" type="button" aria-pressed="true"><span>♫</span> Sound ON</button>
           </div>
         </section>
 

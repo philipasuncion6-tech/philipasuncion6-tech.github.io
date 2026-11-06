@@ -515,3 +515,39 @@ body {
 
 /* Explicitly keep the promotion chooser hidden until a real pawn promotion. */
 #promotion-modal.hidden { display: none !important; }
+
+
+/* Android/mobile interaction and board sizing hardening */
+.board-stage {
+  position: relative;
+  isolation: isolate;
+  width: min(100%, 720px);
+  aspect-ratio: 1 / 1;
+  min-height: 280px;
+  padding: 0;
+  overflow: hidden;
+}
+#board.three-board-host {
+  display: block !important;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  z-index: 1;
+}
+.three-board-host canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none !important;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+.board-stage:after {
+  z-index: 2;
+  pointer-events: none;
+}
+@media (max-width: 760px) {
+  .board-stage { width: 100%; min-height: 280px; }
+}
