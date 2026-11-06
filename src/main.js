@@ -65,6 +65,7 @@ try {
   // WebGL can be unavailable on some mobile browsers. Keep the game playable.
   console.error("3D renderer unavailable; using the built-in 2D board.", error);
   boardElement.classList.remove("three-board-host");
+  boardElement.classList.add("fallback-luxury-board");
   boardElement.style.cssText = "display:grid;position:relative;inset:auto;width:100%;height:auto;aspect-ratio:1;grid-template-columns:repeat(8,minmax(0,1fr));overflow:hidden;";
   scene3d = {
     render(position, selected, targets, previousMove, checkedKing, isFlipped) {
