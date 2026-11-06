@@ -7,8 +7,8 @@ export function createChessScene3D(host, onSquareClick) {
   host.classList.add("three-board-host");
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color("#17131b");
-  scene.fog = new THREE.Fog("#17131b", 22, 42);
+  scene.background = new THREE.Color("#090a0d");
+  // Keep the studio surroundings crisp: no distance fog or smoky haze.
 
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
   camera.position.set(0, 10.5, 12.8);
@@ -21,7 +21,7 @@ export function createChessScene3D(host, onSquareClick) {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.22;
+  renderer.toneMappingExposure = 0.88;
   renderer.transmissionResolutionScale = 1;
   host.appendChild(renderer.domElement);
 
@@ -37,7 +37,7 @@ export function createChessScene3D(host, onSquareClick) {
     roomEnvironment = new RoomEnvironment();
     environmentTarget = pmremGenerator.fromScene(roomEnvironment, 0.04);
     scene.environment = environmentTarget.texture;
-    scene.environmentIntensity = 1.35;
+    scene.environmentIntensity = 0.62;
   } catch (error) {
     console.warn("Optional environment reflections unavailable; continuing with lit 3D materials.", error);
   } finally {
@@ -54,8 +54,8 @@ export function createChessScene3D(host, onSquareClick) {
   controls.maxPolarAngle = Math.PI * 0.48;
   controls.target.set(0, 0.25, 0);
 
-  scene.add(new THREE.HemisphereLight(0xfff8ed, 0x3b3030, 2.5));
-  const keyLight = new THREE.DirectionalLight(0xfff4df, 5.2);
+  scene.add(new THREE.HemisphereLight(0xfff4e7, 0x17191f, 1.05));
+  const keyLight = new THREE.DirectionalLight(0xffedcf, 2.35);
   keyLight.position.set(-5, 10, 7);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(512, 512);
@@ -67,17 +67,17 @@ export function createChessScene3D(host, onSquareClick) {
   keyLight.shadow.camera.top = 7;
   keyLight.shadow.camera.bottom = -7;
   scene.add(keyLight);
-  const fillLight = new THREE.DirectionalLight(0xdce8ff, 3.0);
+  const fillLight = new THREE.DirectionalLight(0xc7d5e8, 0.72);
   fillLight.position.set(6, 7, 4);
   scene.add(fillLight);
-  const rimLight = new THREE.PointLight(0xffffff, 88, 28);
+  const rimLight = new THREE.PointLight(0xdce8f5, 18, 22);
   rimLight.position.set(5, 5, -5);
   scene.add(rimLight);
-  const warmLight = new THREE.PointLight(0xf0c879, 58, 26);
+  const warmLight = new THREE.PointLight(0xd9b879, 12, 20);
   warmLight.position.set(-5, 3, 5);
   scene.add(warmLight);
 
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: "#211b20", roughness: 0.28, metalness: 0.32 }));
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: "#111216", roughness: 0.82, metalness: 0.04 }));
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = -0.34;
   floor.receiveShadow = true;
