@@ -21,7 +21,7 @@ export function createChessScene3D(host, onSquareClick) {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.28;
+  renderer.toneMappingExposure = 1.05;
   renderer.transmissionResolutionScale = 1;
   host.appendChild(renderer.domElement);
 
@@ -44,8 +44,8 @@ export function createChessScene3D(host, onSquareClick) {
   controls.maxPolarAngle = Math.PI * 0.48;
   controls.target.set(0, 0.25, 0);
 
-  scene.add(new THREE.HemisphereLight(0xffe8c4, 0x21130c, 2.25));
-  const keyLight = new THREE.DirectionalLight(0xffdfaa, 3.8);
+  scene.add(new THREE.HemisphereLight(0xffe8c4, 0x21130c, 1.45));
+  const keyLight = new THREE.DirectionalLight(0xffdfaa, 2.35);
   keyLight.position.set(-5, 10, 7);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(1024, 1024);
@@ -57,13 +57,13 @@ export function createChessScene3D(host, onSquareClick) {
   keyLight.shadow.camera.top = 7;
   keyLight.shadow.camera.bottom = -7;
   scene.add(keyLight);
-  const fillLight = new THREE.DirectionalLight(0xfff1d6, 1.35);
+  const fillLight = new THREE.DirectionalLight(0xfff1d6, 0.8);
   fillLight.position.set(6, 7, 4);
   scene.add(fillLight);
-  const rimLight = new THREE.PointLight(0xffa52e, 72, 19);
+  const rimLight = new THREE.PointLight(0xffa52e, 30, 19);
   rimLight.position.set(5, 5, -5);
   scene.add(rimLight);
-  const warmLight = new THREE.PointLight(0xff6a16, 58, 18);
+  const warmLight = new THREE.PointLight(0xff6a16, 24, 18);
   warmLight.position.set(-5, 3, 5);
   scene.add(warmLight);
 
@@ -79,8 +79,8 @@ export function createChessScene3D(host, onSquareClick) {
   scene.add(boardGroup, piecesGroup, targetsGroup);
 
   const wood = new THREE.MeshStandardMaterial({ color: "#6f3515", roughness: 0.2, metalness: 0.42 });
-  const lightSquare = new THREE.MeshStandardMaterial({ color: "#f4dfbd", roughness: 0.19, metalness: 0.12 });
-  const darkSquare = new THREE.MeshStandardMaterial({ color: "#a94d16", roughness: 0.14, metalness: 0.34, emissive: "#5b2108", emissiveIntensity: 0.12 });
+  const lightSquare = new THREE.MeshStandardMaterial({ color: "#e8d3b0", roughness: 0.26, metalness: 0.08 });
+  const darkSquare = new THREE.MeshStandardMaterial({ color: "#71300d", roughness: 0.24, metalness: 0.22, emissive: "#241006", emissiveIntensity: 0.035 });
   const highlight = new THREE.MeshStandardMaterial({ color: "#ffd36a", roughness: 0.2, emissive: "#a85b08", emissiveIntensity: 0.38 });
   const lastHighlight = new THREE.MeshStandardMaterial({ color: "#d58b32", roughness: 0.22, emissive: "#8a3e0a", emissiveIntensity: 0.28 });
   const targetMat = new THREE.MeshBasicMaterial({ color: "#60d58b", transparent: true, opacity: 0.62, depthWrite: false });
@@ -152,17 +152,17 @@ export function createChessScene3D(host, onSquareClick) {
 
     // Honey-amber crystal for the computer (White) and deep cognac amber for the player (Black), matching the supplied orange-gold glass reference.
     const crystal = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#ff9a16" : "#d94b08",
-      metalness: 0.08,
-      roughness: 0.075,
-      transmission: 0.34,
-      thickness: 2.4,
+      color: isWhite ? "#d9780c" : "#a93608",
+      metalness: 0.12,
+      roughness: 0.13,
+      transmission: 0.16,
+      thickness: 2.8,
       ior: 1.62,
       clearcoat: 1,
       clearcoatRoughness: 0.035,
-      attenuationColor: isWhite ? "#f07808" : "#a92b05",
-      attenuationDistance: isWhite ? 1.5 : 1.15,
-      envMapIntensity: 2.2,
+      attenuationColor: isWhite ? "#b95b08" : "#762006",
+      attenuationDistance: isWhite ? 1.8 : 1.4,
+      envMapIntensity: 1.8,
       emissive: isWhite ? "#612304" : "#4d1003",
       emissiveIntensity: 0.12,
       flatShading: true
@@ -189,7 +189,7 @@ export function createChessScene3D(host, onSquareClick) {
       new THREE.Vector2(radius, height)
     );
     const body = new THREE.Mesh(
-      new THREE.LatheGeometry(points, 18),
+      new THREE.LatheGeometry(points, 40),
       crystal
     );
     body.castShadow = true;
@@ -324,6 +324,7 @@ export function createChessScene3D(host, onSquareClick) {
     }
 
     const [file, rank] = ["abcdefgh".indexOf(square[0]), Number(square[1])];
+    group.scale.setScalar(1.12);
     group.position.set(file - 3.5, .30, 4.5 - rank);
     group.userData.square = square;
     group.traverse(obj => {
