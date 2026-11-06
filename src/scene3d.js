@@ -14,7 +14,7 @@ export function createChessScene3D(host, onSquareClick) {
   camera.position.set(0, 10.5, 12.8);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));\n  renderer.domElement.style.touchAction = "none";\n  renderer.domElement.setAttribute("aria-label", "Interactive 3D chessboard. Tap a square to select a piece or destination.");
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -46,7 +46,7 @@ export function createChessScene3D(host, onSquareClick) {
   const keyLight = new THREE.DirectionalLight(0xffdfaa, 3.8);
   keyLight.position.set(-5, 10, 7);
   keyLight.castShadow = true;
-  keyLight.shadow.mapSize.set(2048, 2048);
+  keyLight.shadow.mapSize.set(1024, 1024);
   keyLight.shadow.bias = -0.00018;
   keyLight.shadow.normalBias = 0.025;
   keyLight.shadow.radius = 5;
@@ -153,7 +153,7 @@ export function createChessScene3D(host, onSquareClick) {
     const crystal = new THREE.MeshPhysicalMaterial({
       color: isWhite ? "#f5e8c9" : "#ff941f",
       metalness: 0.04,
-      roughness: 0.105,
+      roughness: 0.22,
       transmission: 0.42,
       thickness: 1.7,
       ior: 1.52,
