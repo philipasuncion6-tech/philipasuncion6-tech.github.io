@@ -137,6 +137,22 @@ export function createChessScene3D(host, onSquareClick) {
     boardGroup.add(rail);
   }
 
+  // Four jeweller-set corner ornaments echo the Pearl Royale crystal-glass board.
+  const cornerPearl = new THREE.MeshPhysicalMaterial({ color: "#fff8e9", roughness: .18, metalness: .1, clearcoat: 1, iridescence: .25 });
+  const cornerDiamond = new THREE.MeshPhysicalMaterial({ color: "#ffffff", roughness: .025, metalness: .02, transmission: .2, ior: 2.2, clearcoat: 1 });
+  for (const x of [-4.02, 4.02]) for (const z of [-4.02, 4.02]) {
+    const mount = new THREE.Mesh(new THREE.CylinderGeometry(.16,.19,.07,48), frameMetal);
+    mount.position.set(x,.22,z);
+    mount.castShadow = true;
+    boardGroup.add(mount);
+    const pearl = new THREE.Mesh(new THREE.SphereGeometry(.095,24,18), cornerPearl);
+    pearl.position.set(x,.31,z);
+    boardGroup.add(pearl);
+    const jewel = new THREE.Mesh(new THREE.OctahedronGeometry(.055,1), cornerDiamond);
+    jewel.position.set(x+.12,.31,z+.02);
+    boardGroup.add(jewel);
+  }
+
   const profiles = {
     p: [[0,.02],[.28,.02],[.31,.08],[.25,.15],[.17,.2],[.14,.34],[.21,.43],[.24,.49],[.2,.57],[.13,.61],[.1,.72],[.04,.77],[0,.77]],
     r: [[0,.02],[.3,.02],[.32,.1],[.24,.17],[.2,.35],[.26,.4],[.26,.54],[.31,.56],[.31,.65],[.22,.65],[.22,.59],[.14,.59],[.14,.65],[.06,.65],[.06,.59],[0,.59]],
