@@ -147,31 +147,119 @@ export function createChessScene3D(host, onSquareClick) {
   function makePiece(piece, square) {
     const group = new THREE.Group();
     const isWhite = piece.color === "w";
-    // Royal jewel palette: Computer (White) is emerald malachite;
-    // Player (Black) is luminous amber crystal. Gold trim is shared.
-    const glass = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#075b43" : "#ff8a16",
-      metalness: isWhite ? 0.16 : 0.035,
-      roughness: isWhite ? 0.19 : 0.075,
-      transmission: isWhite ? 0.12 : 0.48,
-      thickness: 1.6,
-      ior: 1.52,
-      transparent: false,
-      opacity: 1,
+    // White: deep emerald crystal. Black: glowing amber crystal.
+    const crystal = new THREE.MeshPhysicalMaterial({
+      color: isWhite ? "#087653" : "#ff8a16",
+      metalness: 0.12,
+      roughness: 0.16,
+      transmission: 0.18,
+      thickness: 1.35,
+      ior: 1.48,
       clearcoat: 1,
-      clearcoatRoughness: 0.035,
-      attenuationColor: isWhite ? "#063d32" : "#e65a08",
-      attenuationDistance: isWhite ? 2.8 : 2.2,
-      specularIntensity: 1,
-      specularColor: isWhite ? "#c7ffe6" : "#fff0c8",
-      envMapIntensity: 2.3,
+      clearcoatRoughness: 0.045,
+      attenuationColor: isWhite ? "#064b38" : "#df5b08",
+      attenuationDistance: 2.4,
+      envMapIntensity: 1.8,
       flatShading: true
     });
-    const metal = new THREE.MeshStandardMaterial({
-      color: "#e7c477",
-      metalness: 0.84,
-      roughness: 0.18
+    const gold = new THREE.MeshStandardMaterial({
+      color: "#e8c77f",
+      metalness: 0.88,
+      roughness: 0.2
     });
+    const darkGold = new THREE.MeshStandardMaterial({
+      color: "#9c7138",
+      metalness: 0.82,
+      roughness: 0.25
+    });
+
+    // Turn each silhouette profile into a real faceted 3D lathed solid.
+    const points = profiles[piece.type].map(([radius, height]) =>
+      new THREE.Vector2(radius, height)
+    );
+    const body = new THREE.Mesh(
+      new THREE.LatheGeometry(points, 10),
+      crystal
+    );
+    body.castShadow = true;
+    body.receiveShadow = true;
+    group.add(body);
+
+    // Layered gold plinth and fine trim rings.
+    const addCylinder = (radiusTop, radiusBottom, height, y, material, sides = 12) => {
+      const mesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(radiusTop, radiusBottom, height, sides, 1),
+        material
+      );
+      mesh.position.y = y;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      group.add(mesh);
+    };
+    addCylinder(0.29, 0.32, 0.075, 0.055, gold);
+    addCylinder(0.25, 0.29, 0.045, 0.115, darkGold);
+    addCylinder(0.205, 0.22, 0.035, 0.19, gold);
+
+    // Piece-specific silhouettes and unmistakable crowns.
+    if (piece.type === "k") {
+      addCylinder(0.105, 0.13, 0.07, 0.73, gold);
+      const cross = new THREE.Group();
+      const vertical = new THREE.Mesh(new THREE.BoxGeometry(0.065, 0.27, 0.065), gold);
+      vertical.position.y = 0.91;
+      const horizontal = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.065, 0.065), gold);
+      horizontal.position.y = 0.94;
+      cross.add(vertical, horizontal);
+      cross.traverse(o => { if (o.isMesh) o.castShadow = true; });
+      group.add(cross);
+    } else if (piece.type === "q") {
+      addCylinder(0.13, 0.16, 0.065, 0.74, gold);
+      for (let i = 0; i < 5; i++) {
+        const a = (i / 5) * Math.PI * 2;
+        const gem = new THREE.Mesh(
+          new THREE.OctahedronGeometry(0.085, 0),
+          gold
+        );
+        gem.position.set(Math.cos(a) * 0.19, 0.84, Math.sin(a) * 0.19);
+        gem.castShadow = true;
+        group.add(gem);
+      }
+      const crown = new THREE.Mesh(new THREE.OctahedronGeometry(0.11, 0), crystal);
+      crown.position.y = 0.9;
+      crown.castShadow = true;
+      group.add(crown);
+    } else if (piece.type === "r") {
+      addCylinder(0.22, 0.24, 0.075, 0.66, gold);
+      const merlons = new THREE.CylinderGeometry(0.055, 0.055, 0.14, 4);
+      for (let i = 0; i < 4; i++) {
+        const a = i * Math.PI / 2 + Math.PI / 4;
+        const tooth = new THREE.Mesh(merlons, gold);
+        tooth.position.set(Math.cos(a) * 0.19, 0.77, Math.sin(a) * 0.19);
+        tooth.castShadow = true;
+        group.add(tooth);
+      }
+    } else if (piece.type === "b") {
+      const tip = new THREE.Mesh(new THREE.OctahedronGeometry(0.13, 0), gold);
+      tip.position.y = 0.78;
+      tip.castShadow = true;
+      group.add(tip);
+    } else if (piece.type === "n") {
+      const head = new THREE.Mesh(new THREE.OctahedronGeometry(0.2, 1), crystal);
+      head.position.set(0, 0.61, -0.035);
+      head.scale.set(0.8, 1.15, 0.72);
+      head.rotation.z = -0.22;
+      head.castShadow = true;
+      group.add(head);
+      const ear = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.2, 5), gold);
+      ear.position.set(0.09, 0.78, -0.02);
+      ear.castShadow = true;
+      group.add(ear);
+    } else if (piece.type === "p") {
+      const orb = new THREE.Mesh(new THREE.IcosahedronGeometry(0.13, 1), gold);
+      orb.position.y = 0.69;
+      orb.castShadow = true;
+      group.add(orb);
+    }
+
     const [file, rank] = ["abcdefgh".indexOf(square[0]), Number(square[1])];
     group.position.set(file - 3.5, .30, 4.5 - rank);
     group.userData.square = square;
