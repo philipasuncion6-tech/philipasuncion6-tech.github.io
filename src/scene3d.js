@@ -7,8 +7,8 @@ export function createChessScene3D(host, onSquareClick) {
   host.classList.add("three-board-host");
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color("#07101d");
-  scene.fog = new THREE.Fog("#07101d", 17, 32);
+  scene.background = new THREE.Color("#050914");
+  scene.fog = new THREE.Fog("#050914", 19, 36);
 
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
   camera.position.set(0, 10.5, 12.8);
@@ -21,7 +21,7 @@ export function createChessScene3D(host, onSquareClick) {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = 1.22;
   renderer.transmissionResolutionScale = 1;
   host.appendChild(renderer.domElement);
 
@@ -44,8 +44,8 @@ export function createChessScene3D(host, onSquareClick) {
   controls.maxPolarAngle = Math.PI * 0.48;
   controls.target.set(0, 0.25, 0);
 
-  scene.add(new THREE.HemisphereLight(0xdff6ff, 0x101b3a, 1.75));
-  const keyLight = new THREE.DirectionalLight(0xe8f8ff, 2.7);
+  scene.add(new THREE.HemisphereLight(0xf0fbff, 0x111a35, 2.05));
+  const keyLight = new THREE.DirectionalLight(0xffffff, 3.25);
   keyLight.position.set(-5, 10, 7);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(1024, 1024);
@@ -57,17 +57,17 @@ export function createChessScene3D(host, onSquareClick) {
   keyLight.shadow.camera.top = 7;
   keyLight.shadow.camera.bottom = -7;
   scene.add(keyLight);
-  const fillLight = new THREE.DirectionalLight(0x8ccfff, 1.15);
+  const fillLight = new THREE.DirectionalLight(0xb5e8ff, 1.65);
   fillLight.position.set(6, 7, 4);
   scene.add(fillLight);
-  const rimLight = new THREE.PointLight(0x71d8ff, 38, 20);
+  const rimLight = new THREE.PointLight(0x8de4ff, 52, 22);
   rimLight.position.set(5, 5, -5);
   scene.add(rimLight);
-  const warmLight = new THREE.PointLight(0x6677ff, 22, 18);
+  const warmLight = new THREE.PointLight(0x9aabff, 30, 20);
   warmLight.position.set(-5, 3, 5);
   scene.add(warmLight);
 
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: "#050914", roughness: 0.78, metalness: 0.12 }));
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: "#070d1d", roughness: 0.62, metalness: 0.24 }));
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = -0.34;
   floor.receiveShadow = true;
@@ -78,11 +78,11 @@ export function createChessScene3D(host, onSquareClick) {
   const targetsGroup = new THREE.Group();
   scene.add(boardGroup, piecesGroup, targetsGroup);
 
-  const wood = new THREE.MeshStandardMaterial({ color: "#102b55", roughness: 0.16, metalness: 0.72 });
-  const lightSquare = new THREE.MeshStandardMaterial({ color: "#f2fcff", roughness: 0.16, metalness: 0.18 });
-  const darkSquare = new THREE.MeshStandardMaterial({ color: "#123d78", roughness: 0.16, metalness: 0.42, emissive: "#123b75", emissiveIntensity: 0.12 });
-  const highlight = new THREE.MeshStandardMaterial({ color: "#d9f7ff", roughness: 0.2, emissive: "#397ba8", emissiveIntensity: 0.38 });
-  const lastHighlight = new THREE.MeshStandardMaterial({ color: "#7bdcff", roughness: 0.22, emissive: "#285d94", emissiveIntensity: 0.28 });
+  const wood = new THREE.MeshPhysicalMaterial({ color: "#102b55", roughness: 0.2, metalness: 0.78, clearcoat: 1, clearcoatRoughness: 0.08 });
+  const lightSquare = new THREE.MeshPhysicalMaterial({ color: "#f4fdff", roughness: 0.12, metalness: 0.12, clearcoat: 1, clearcoatRoughness: 0.045 });
+  const darkSquare = new THREE.MeshPhysicalMaterial({ color: "#123d78", roughness: 0.105, metalness: 0.38, emissive: "#123b75", emissiveIntensity: 0.16, clearcoat: 1, clearcoatRoughness: 0.035 });
+  const highlight = new THREE.MeshStandardMaterial({ color: "#e8fbff", roughness: 0.12, metalness: 0.2, emissive: "#4ebfff", emissiveIntensity: 0.42 });
+  const lastHighlight = new THREE.MeshStandardMaterial({ color: "#91e7ff", roughness: 0.14, metalness: 0.24, emissive: "#286caa", emissiveIntensity: 0.34 });
   const targetMat = new THREE.MeshBasicMaterial({ color: "#60d58b", transparent: true, opacity: 0.62, depthWrite: false });
   const checkedSquare = new THREE.MeshStandardMaterial({ color: "#b43a32", emissive: "#8f160d", emissiveIntensity: .55 });
 
@@ -150,7 +150,7 @@ export function createChessScene3D(host, onSquareClick) {
     const group = new THREE.Group();
     const isWhite = piece.color === "w";
 
-    // Honey-amber crystal for the computer (White) and deep cognac amber for the player (Black), matching the supplied orange-gold glass reference.
+    // Ice-diamond crystal for the computer (White) and deep sapphire crystal for the player (Black).
     const crystal = new THREE.MeshPhysicalMaterial({
       color: isWhite ? "#e9fbff" : "#234d91",
       metalness: 0.08,
