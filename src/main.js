@@ -52,10 +52,12 @@ let thinking = false;
 let pendingPromotion = null;
 let toastTimer = null;
 let computerMoveToken = 0;
+let soundEnabled = true;
+let audioContext = null;
 
 // AI SETTINGS
 const MATE_SCORE = 100000;
-const AI_SEARCH_DEPTH = 3;
+let AI_SEARCH_DEPTH = 3;
 let scene3d;
 try {
   scene3d = createChessScene3D(boardElement, (name) => handleSquareClick(name));
@@ -94,6 +96,36 @@ try {
       }
     }
   };
+}
+
+function playSound(kind = "move") {
+  if (!soundEnabled) return;
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    audioContext ||= new AudioContextClass();
+    if (audioContext.state === "suspended") audioContext.resume();
+    const now = audioContext.currentTime;
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    const settings = kind === "capture"
+      ? { frequency: 245, duration: 0.13, type: "triangle" }
+      : kind === "check"
+        ? { frequency: 620, duration: 0.2, type: "sine" }
+        : { frequency: 390, duration: 0.085, type: "sine" };
+    oscillator.type = settings.type;
+    oscillator.frequency.setValueAtTime(settings.frequency, now);
+    oscillator.frequency.exponentialRampToValueAtTime(settings.frequency * 0.72, now + settings.duration);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.12, now + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + settings.duration);
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start(now);
+    oscillator.stop(now + settings.duration + 0.02);
+  } catch (error) {
+    console.debug("Audio is unavailable in this browser.", error);
+  }
 }
 
 function showToast(message) {
@@ -208,6 +240,7 @@ function makePlayerMove(from, to, promotion = "q") {
     return;
   }
 
+  playSound(move.captured ? "capture" : game.in_check() ? "check" : "move");
   render();
 
   if (!game.game_over()) {
@@ -525,6 +558,7 @@ function startComputerMove() {
         if (!played) {
           throw new Error("Computer move was rejected.");
         }
+        playSound(played.captured ? "capture" : game.in_check() ? "check" : "move");
       }
     } catch (error) {
       console.error("Computer AI error:", error);
@@ -740,6 +774,24 @@ $("new-game").addEventListener("click", newGame);
 $("undo").addEventListener("click", undoMove);
 
 $("flip").addEventListener("click", flipBoard);
+
+$("difficulty-select").addEventListener("change", (event) => {
+  const selectedDepth = Number(event.target.value);
+  AI_SEARCH_DEPTH = [2, 3, 4].includes(selectedDepth) ? selectedDepth : 3;
+  const levelName = AI_SEARCH_DEPTH === 2 ? "Easy" : AI_SEARCH_DEPTH === 4 ? "Hard" : "Medium";
+  $("difficulty-select").setAttribute("aria-label", `Computer difficulty: ${levelName}`);
+  showToast(`Computer difficulty: ${levelName}`);
+});
+
+$("sound-toggle").addEventListener("click", () => {
+  soundEnabled = !soundEnabled;
+  const button = $("sound-toggle");
+  button.setAttribute("aria-pressed", String(soundEnabled));
+  button.innerHTML = soundEnabled
+    ? "<span>♫</span> Sound ON"
+    : "<span>♪</span> Sound OFF";
+  if (soundEnabled) playSound("move");
+});
 
 $("cancel-promotion").addEventListener("click", () => {
   closePromotion();
