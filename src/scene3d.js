@@ -291,15 +291,58 @@ export function createChessScene3D(host, onSquareClick) {
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
-  renderer.domElement.addEventListener("pointerdown", (event) => {
+  const boardPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.30);
+  const downPoint = { x: 0, y: 0, id: null };
+
+  function pickSquare(event) {
     const rect = renderer.domElement.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+
     pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
-    const hits = raycaster.intersectObjects([...piecesGroup.children, ...boardGroup.children], true);
+
+    // Prefer the actual chess piece or tile under the finger.
+    const hits = raycaster.intersectObjects(
+      [...piecesGroup.children, ...boardGroup.children],
+      true
+    );
     const hit = hits.find(item => item.object.userData.square);
-    if (hit) onSquareClick(hit.object.userData.square);
-  });
+    if (hit) {
+      onSquareClick(hit.object.userData.square);
+      return;
+    }
+
+    // Fallback: map the touch position onto the board surface.
+    const point = new THREE.Vector3();
+    if (!raycaster.ray.intersectPlane(boardPlane, point)) return;
+    const file = Math.floor(point.x + 4);
+    const rank = 8 - Math.floor(4.5 - point.z);
+    if (file >= 0 && file < 8 && rank >= 1 && rank <= 8) {
+      onSquareClick("abcdefgh"[file] + rank);
+    }
+  }
+
+  renderer.domElement.addEventListener("pointerdown", event => {
+    downPoint.x = event.clientX;
+    downPoint.y = event.clientY;
+    downPoint.id = event.pointerId;
+  }, { passive: true });
+
+  renderer.domElement.addEventListener("pointerup", event => {
+    if (downPoint.id !== event.pointerId) return;
+    const moved = Math.hypot(
+      event.clientX - downPoint.x,
+      event.clientY - downPoint.y
+    );
+    downPoint.id = null;
+    // Ignore camera drags; treat a short touch as a square selection.
+    if (moved <= 12) pickSquare(event);
+  }, { passive: true });
+
+  renderer.domElement.addEventListener("pointercancel", () => {
+    downPoint.id = null;
+  }, { passive: true });
 
   let currentFlipped = null;
   function disposeGroup(group) {
