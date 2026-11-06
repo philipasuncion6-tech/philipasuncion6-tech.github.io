@@ -115,12 +115,12 @@ export function createChessScene3D(host, onSquareClick) {
   edge.position.y = -0.25;
   boardGroup.add(edge);
 
-  // Four champagne-gold rails frame the playing surface like a handcrafted
-  // luxury table. They sit just outside the 8x8 tiles and stay non-interactive.
+  // Champagne-gold rails frame the playing surface like a handcrafted
+  // royal jewel case. They sit just outside the 8x8 tiles and stay non-interactive.
   const frameMetal = new THREE.MeshStandardMaterial({
-    color: "#dff7ff",
-    metalness: 0.98,
-    roughness: 0.1
+    color: "#e7c982",
+    metalness: 1,
+    roughness: 0.065
   });
   const railLong = new THREE.BoxGeometry(8.22, 0.055, 0.075);
   const railShort = new THREE.BoxGeometry(0.075, 0.055, 8.22);
@@ -152,35 +152,35 @@ export function createChessScene3D(host, onSquareClick) {
 
     // Ice-diamond crystal for the computer (White) and deep sapphire crystal for the player (Black).
     const crystal = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#e9fbff" : "#234d91",
-      metalness: 0.08,
-      roughness: 0.075,
-      transmission: 0.72,
-      thickness: 4.2,
-      ior: 2.18,
+      color: isWhite ? "#f5fdff" : "#174b9b",
+      metalness: 0.035,
+      roughness: 0.035,
+      transmission: 0.94,
+      thickness: 5.5,
+      ior: 2.25,
       clearcoat: 1,
       clearcoatRoughness: 0.035,
-      attenuationColor: isWhite ? "#e5fbff" : "#174b9a",
-      attenuationDistance: isWhite ? 2.4 : 1.9,
-      envMapIntensity: 3.0,
-      emissive: isWhite ? "#8edfff" : "#0b2c68",
-      emissiveIntensity: 0.2,
+      attenuationColor: isWhite ? "#eafcff" : "#235fc0",
+      attenuationDistance: isWhite ? 3.8 : 2.8,
+      envMapIntensity: 4.2,
+      emissive: isWhite ? "#b7f0ff" : "#123d91",
+      emissiveIntensity: 0.13,
       flatShading: true
     });
     const gold = new THREE.MeshStandardMaterial({
-      color: "#eafaff",
+      color: "#e7c982",
       metalness: 1,
-      roughness: 0.08
+      roughness: 0.065
     });
     const silver = new THREE.MeshStandardMaterial({
-      color: "#ffffff",
-      metalness: 0.94,
-      roughness: 0.16
-    });
-    const darkGold = new THREE.MeshStandardMaterial({
-      color: "#2458a4",
+      color: "#f3fcff",
       metalness: 0.98,
       roughness: 0.1
+    });
+    const darkGold = new THREE.MeshStandardMaterial({
+      color: "#16417e",
+      metalness: 0.99,
+      roughness: 0.075
     });
     const trim = isWhite ? silver : gold;
 
