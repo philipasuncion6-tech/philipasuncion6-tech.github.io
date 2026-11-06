@@ -14,7 +14,7 @@ export function createChessScene3D(host, onSquareClick) {
   camera.position.set(0, 10.5, 12.8);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
   renderer.domElement.style.touchAction = "none";
   renderer.domElement.setAttribute("aria-label", "Interactive 3D chessboard. Tap a square to select a piece or destination.");
   renderer.shadowMap.enabled = true;
@@ -25,16 +25,25 @@ export function createChessScene3D(host, onSquareClick) {
   renderer.transmissionResolutionScale = 1;
   host.appendChild(renderer.domElement);
 
-  // A real environment map gives the crystal surfaces something to refract
-  // and reflect; without it, transmissive pieces can look flat or papery.
-  const pmremGenerator = new THREE.PMREMGenerator(renderer);
-  pmremGenerator.compileEquirectangularShader();
-  const roomEnvironment = new RoomEnvironment();
-  const environmentTarget = pmremGenerator.fromScene(roomEnvironment, 0.04);
-  scene.environment = environmentTarget.texture;
-  scene.environmentIntensity = 1.35;
-  roomEnvironment.dispose();
-  pmremGenerator.dispose();
+  // Environment reflections enrich the precious materials, but PMREM shader
+  // compilation can fail on some Android/WebView GPUs. Keep the real 3D scene
+  // alive with its studio lights even when that optional reflection map fails.
+  let environmentTarget = null;
+  let roomEnvironment = null;
+  let pmremGenerator = null;
+  try {
+    pmremGenerator = new THREE.PMREMGenerator(renderer);
+    pmremGenerator.compileEquirectangularShader();
+    roomEnvironment = new RoomEnvironment();
+    environmentTarget = pmremGenerator.fromScene(roomEnvironment, 0.04);
+    scene.environment = environmentTarget.texture;
+    scene.environmentIntensity = 1.35;
+  } catch (error) {
+    console.warn("Optional environment reflections unavailable; continuing with lit 3D materials.", error);
+  } finally {
+    roomEnvironment?.dispose();
+    pmremGenerator?.dispose();
+  }
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
@@ -49,7 +58,7 @@ export function createChessScene3D(host, onSquareClick) {
   const keyLight = new THREE.DirectionalLight(0xfff4df, 5.2);
   keyLight.position.set(-5, 10, 7);
   keyLight.castShadow = true;
-  keyLight.shadow.mapSize.set(1024, 1024);
+  keyLight.shadow.mapSize.set(512, 512);
   keyLight.shadow.bias = -0.00018;
   keyLight.shadow.normalBias = 0.025;
   keyLight.shadow.radius = 5;
