@@ -491,3 +491,24 @@ body {
   .control-btn { transition: transform .18s ease, filter .18s ease, box-shadow .18s ease; }
   .control-btn:hover { transform: translateY(-2px); filter: brightness(1.08); }
 }
+
+/* WebGL canvas must replace the old 2D grid styling on #board. */
+.board-stage { position:relative; }
+.board-stage:before { z-index:3; pointer-events:none; }
+.three-board-host.chessboard {
+  position:absolute !important; inset:0 !important;
+  display:block !important; width:100% !important; height:100% !important;
+  min-height:0 !important; aspect-ratio:auto !important;
+  padding:0 !important; margin:0 !important;
+  border:0 !important; border-radius:inherit !important;
+  overflow:hidden !important; box-shadow:none !important;
+  background:transparent !important;
+}
+.three-board-host canvas {
+  position:absolute; inset:0; width:100% !important; height:100% !important;
+  display:block; touch-action:pan-y;
+}
+.board-stage:after { z-index:4; }
+@media (max-width:760px) {
+  .board-stage { width:min(100%,720px); }
+}
