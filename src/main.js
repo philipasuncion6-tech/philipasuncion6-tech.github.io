@@ -715,6 +715,9 @@ $("cancel-promotion").addEventListener("click", () => {
 // START GAME
 // ======================================
 
+// Keep the promotion chooser closed until a pawn reaches its final rank.
+closePromotion();
+
 // Computer plays White first.
 // Player controls Black.
 
