@@ -512,3 +512,6 @@ body {
 @media (max-width:760px) {
   .board-stage { width:min(100%,720px); }
 }
+
+/* Explicitly keep the promotion chooser hidden until a real pawn promotion. */
+#promotion-modal.hidden { display: none !important; }

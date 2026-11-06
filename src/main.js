@@ -56,7 +56,45 @@ let computerMoveToken = 0;
 // AI SETTINGS
 const MATE_SCORE = 100000;
 const AI_SEARCH_DEPTH = 3;
-const scene3d = createChessScene3D(boardElement, (name) => handleSquareClick(name));
+let scene3d;
+try {
+  scene3d = createChessScene3D(boardElement, (name) => handleSquareClick(name));
+} catch (error) {
+  // WebGL can be unavailable on some mobile browsers. Keep the game playable.
+  console.error("3D renderer unavailable; using the built-in 2D board.", error);
+  boardElement.classList.remove("three-board-host");
+  boardElement.style.cssText = "display:grid;position:relative;inset:auto;width:100%;height:auto;aspect-ratio:1;grid-template-columns:repeat(8,minmax(0,1fr));overflow:hidden;";
+  scene3d = {
+    render(position, selected, targets, previousMove, checkedKing, isFlipped) {
+      const rows = position.board();
+      boardElement.replaceChildren();
+      for (let screenRow = 0; screenRow < 8; screenRow++) {
+        for (let screenCol = 0; screenCol < 8; screenCol++) {
+          const row = isFlipped ? 7 - screenRow : screenRow;
+          const col = isFlipped ? 7 - screenCol : screenCol;
+          const square = "abcdefgh"[col] + (8 - row);
+          const piece = rows[row][col];
+          const cell = document.createElement("button");
+          cell.type = "button";
+          cell.className = "square " + ((row + col) % 2 ? "sq-dark" : "sq-light");
+          if (square === selected) cell.classList.add("selected");
+          if (targets.includes(square)) cell.classList.add("move-target");
+          if (previousMove && (square === previousMove.from || square === previousMove.to)) cell.classList.add("last-move");
+          if (checkedKing === square) cell.classList.add("in-check");
+          cell.setAttribute("aria-label", square);
+          if (piece) {
+            const glyph = document.createElement("span");
+            glyph.className = "piece " + (piece.color === "w" ? "white-piece" : "black-piece");
+            glyph.textContent = glyphs[piece.color][piece.type];
+            cell.appendChild(glyph);
+          }
+          cell.addEventListener("click", () => handleSquareClick(square));
+          boardElement.appendChild(cell);
+        }
+      }
+    }
+  };
+}
 
 function showToast(message) {
   toastElement.textContent = message;
