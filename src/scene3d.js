@@ -92,48 +92,92 @@ export function createChessScene3D(host, onSquareClick) {
   // the board from reading as flat, glossy plastic under the studio lights.
   function makeSurfaceTexture(kind) {
     const canvas = document.createElement("canvas");
-    canvas.width = canvas.height = 512;
+    canvas.width = canvas.height = 1024;
     const ctx = canvas.getContext("2d");
     const pearlMode = kind === "pearl";
-    const gradient = ctx.createRadialGradient(170, 135, 18, 256, 256, 390);
+    const gradient = ctx.createRadialGradient(245, 190, 24, 520, 520, 760);
     if (pearlMode) {
-      gradient.addColorStop(0, "#fffdf5");
-      gradient.addColorStop(.48, "#e9dfcb");
-      gradient.addColorStop(1, "#c9c0b2");
+      gradient.addColorStop(0, "#fffef9");
+      gradient.addColorStop(.24, "#f5eddf");
+      gradient.addColorStop(.55, "#ddd0bd");
+      gradient.addColorStop(.82, "#c8c1b8");
+      gradient.addColorStop(1, "#a9a6a2");
     } else {
-      gradient.addColorStop(0, "#242b3a");
-      gradient.addColorStop(.42, "#090d17");
-      gradient.addColorStop(1, "#020308");
+      gradient.addColorStop(0, "#30394a");
+      gradient.addColorStop(.22, "#151c2b");
+      gradient.addColorStop(.58, "#080d17");
+      gradient.addColorStop(1, "#010308");
     }
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 512, 512);
-    for (let i = 0; i < 34; i++) {
-      const x = (i * 137) % 512, y = (i * 223) % 512;
+    ctx.fillRect(0, 0, 1024, 1024);
+
+    // Real mineral character: flowing nacre ribbons on ivory, fractured
+    // blue-silver veins on obsidian, plus fine grain to break the flat surface.
+    ctx.save();
+    for (let i = 0; i < 92; i++) {
+      const x = (i * 173 + 61) % 1024;
+      const y = (i * 293 + 37) % 1024;
       ctx.beginPath();
-      ctx.ellipse(x, y, pearlMode ? 95 + (i % 5) * 13 : 75 + (i % 4) * 17,
-        pearlMode ? 18 + (i % 4) * 5 : 3 + (i % 3) * 2, (i % 7) * .31, 0, Math.PI * 2);
-      ctx.strokeStyle = pearlMode
-        ? ["rgba(255,255,255,.25)","rgba(184,166,196,.13)","rgba(193,177,133,.15)"][i % 3]
-        : ["rgba(90,126,170,.18)","rgba(130,105,163,.12)","rgba(255,255,255,.06)"][i % 3];
-      ctx.lineWidth = pearlMode ? 2.2 : 1.4;
+      if (pearlMode) {
+        ctx.ellipse(x, y, 150 + (i % 7) * 27, 15 + (i % 5) * 8, (i % 11) * .19, 0, Math.PI * 2);
+        const colors = ["rgba(255,255,255,.34)","rgba(179,159,190,.23)","rgba(205,179,132,.24)","rgba(134,174,181,.15)"];
+        ctx.strokeStyle = colors[i % colors.length];
+        ctx.lineWidth = 2 + (i % 3);
+      } else {
+        ctx.moveTo(x - 180, y - 70);
+        ctx.lineTo(x - 48, y - 18);
+        ctx.lineTo(x + 15, y + 5);
+        ctx.lineTo(x + 76, y + 2);
+        ctx.lineTo(x + 175, y + 84);
+        const colors = ["rgba(117,157,202,.28)","rgba(168,180,205,.17)","rgba(80,113,161,.30)","rgba(255,255,255,.09)"];
+        ctx.strokeStyle = colors[i % colors.length];
+        ctx.lineWidth = 1.2 + (i % 3) * .7;
+      }
       ctx.stroke();
     }
+    ctx.restore();
+
+    // Broad silky iridescence, strongest at grazing angles.
+    if (pearlMode) {
+      const sheen = ctx.createLinearGradient(0, 90, 1024, 900);
+      sheen.addColorStop(0, "rgba(255,255,255,.24)");
+      sheen.addColorStop(.28, "rgba(193,180,207,.08)");
+      sheen.addColorStop(.52, "rgba(255,255,255,.20)");
+      sheen.addColorStop(.76, "rgba(180,205,204,.07)");
+      sheen.addColorStop(1, "rgba(255,255,255,.17)");
+      ctx.fillStyle = sheen;
+      ctx.fillRect(0, 0, 1024, 1024);
+    }
+
+    // Deterministic micro-grain; fine enough to read as stone, not noise.
+    let seed = pearlMode ? 7193 : 3817;
+    for (let i = 0; i < 14500; i++) {
+      seed = (seed * 16807) % 2147483647;
+      const x = seed % 1024;
+      seed = (seed * 16807) % 2147483647;
+      const y = seed % 1024;
+      const alpha = .025 + (seed % 30) / 1000;
+      ctx.fillStyle = pearlMode ? `rgba(255,255,255,${alpha})` : `rgba(170,190,220,${alpha})`;
+      ctx.fillRect(x, y, 1 + (seed % 2), 1 + (seed % 2));
+    }
+
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;
-    texture.anisotropy = 8;
+    texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+    texture.needsUpdate = true;
     return texture;
   }
   const pearlMap = makeSurfaceTexture("pearl");
   const obsidianMap = makeSurfaceTexture("obsidian");
   const wood = new THREE.MeshPhysicalMaterial({ color: "#b58a4d", roughness: 0.24, metalness: 0.92, clearcoat: 1, clearcoatRoughness: 0.12 });
   const lightSquare = new THREE.MeshPhysicalMaterial({
-    color: "#fff8e9", map: pearlMap, roughness: 0.24, metalness: 0.12,
-    clearcoat: 0.88, clearcoatRoughness: 0.16, iridescence: 0.82,
+    color: "#fff8e9", map: pearlMap, roughness: 0.19, metalness: 0.08,
+    clearcoat: 1, clearcoatRoughness: 0.09, iridescence: 1,
     iridescenceIOR: 1.42, iridescenceThicknessRange: [360, 820],
     specularIntensity: 0.8, envMapIntensity: 1.35
   });
   const darkSquare = new THREE.MeshPhysicalMaterial({
-    color: "#101522", map: obsidianMap, roughness: 0.17, metalness: 0.38,
+    color: "#101522", map: obsidianMap, roughness: 0.12, metalness: 0.3,
     emissive: "#07101e", emissiveIntensity: 0.035,
     clearcoat: 1, clearcoatRoughness: 0.11, envMapIntensity: 1.6
   });
