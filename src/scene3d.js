@@ -150,21 +150,22 @@ export function createChessScene3D(host, onSquareClick) {
     const group = new THREE.Group();
     const isWhite = piece.color === "w";
 
-    // The two armies share the reference's amber / clear-glass language:
-    // one side is honey amber, the other is pale champagne crystal.
+    // Emerald crystal for the computer (White) and ruby crystal for the
+    // player (Black). Rich saturated color and crisp facets keep the gems
+    // readable on a phone instead of washing out like pale glass.
     const crystal = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#f5e8c9" : "#ff941f",
-      metalness: 0.04,
-      roughness: 0.22,
-      transmission: 0.42,
-      thickness: 1.7,
-      ior: 1.52,
+      color: isWhite ? "#00d889" : "#e50946",
+      metalness: 0.08,
+      roughness: 0.11,
+      transmission: 0.24,
+      thickness: 2.4,
+      ior: isWhite ? 1.58 : 1.76,
       clearcoat: 1,
-      clearcoatRoughness: 0.025,
-      attenuationColor: isWhite ? "#e8d5a9" : "#d95b08",
-      attenuationDistance: isWhite ? 4.8 : 1.65,
-      envMapIntensity: 2.25,
-      flatShading: false
+      clearcoatRoughness: 0.018,
+      attenuationColor: isWhite ? "#00a85e" : "#a9002b",
+      attenuationDistance: isWhite ? 2.1 : 1.8,
+      envMapIntensity: 2.8,
+      flatShading: true
     });
     const gold = new THREE.MeshStandardMaterial({
       color: "#f0d18b",
@@ -188,7 +189,7 @@ export function createChessScene3D(host, onSquareClick) {
       new THREE.Vector2(radius, height)
     );
     const body = new THREE.Mesh(
-      new THREE.LatheGeometry(points, 32),
+      new THREE.LatheGeometry(points, 18),
       crystal
     );
     body.castShadow = true;
