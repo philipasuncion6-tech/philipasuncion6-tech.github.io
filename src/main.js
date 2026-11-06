@@ -658,32 +658,30 @@ function newGame() {
 function undoMove() {
   if (thinking || pendingPromotion) return;
 
-  if (game.history().length === 0) {
-    showToast("No moves to undo.");
+  const history = game.history({ verbose: true });
+
+  // The computer's opening move is not a player turn to undo.
+  if (!history.some(move => move.color === "b")) {
+    showToast("Make a move first before using Undo.");
     return;
   }
 
   computerMoveToken++;
 
-  // Remove computer's last move.
+  // Undo the most recent move. If White (the computer) just replied,
+  // also undo the Black move immediately before it.
   game.undo();
 
-  // Remove player's previous move too.
-  if (
-    game.turn() === "b" &&
-    game.history().length > 0
-  ) {
+  if (game.turn() === "w" && game.history().length > 0) {
     game.undo();
   }
 
   clearSelection();
   closePromotion();
-
   thinking = false;
-
   render();
 
-  showToast("Previous turn restored.");
+  showToast("Your previous turn was undone.");
 }
 
 // ======================================
