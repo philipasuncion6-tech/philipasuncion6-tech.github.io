@@ -11,7 +11,7 @@ export function createChessScene3D(host, onSquareClick) {
   scene.fog = new THREE.Fog("#090a0e", 17, 32);
 
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
-  camera.position.set(0, 10.5, -12.8);
+  camera.position.set(0, 10.5, 12.8);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -97,7 +97,7 @@ export function createChessScene3D(host, onSquareClick) {
   for (let rank = 1; rank <= 8; rank++) {
     for (let file = 0; file < 8; file++) {
       const squareName = "abcdefgh"[file] + rank;
-      const tile = new THREE.Mesh(tileGeometry, (file + rank) % 2 ? lightSquare : darkSquare);
+      const tile = new THREE.Mesh(tileGeometry, (file + rank) % 2 === 0 ? lightSquare : darkSquare);
       tile.position.set(file - 3.5, 0.235, 4.5 - rank);
       tile.receiveShadow = true;
       tile.userData.square = squareName;
@@ -317,7 +317,7 @@ export function createChessScene3D(host, onSquareClick) {
     disposeGroup(targetsGroup);
     pieceMeshes.length = 0;
     for (const [name, tile] of squareMeshes) {
-      tile.material = (Number(name[1]) + "abcdefgh".indexOf(name[0])) % 2 ? lightSquare : darkSquare;
+      tile.material = (Number(name[1]) + "abcdefgh".indexOf(name[0])) % 2 === 0 ? lightSquare : darkSquare;
       if (lastMove && (lastMove.from === name || lastMove.to === name)) tile.material = lastHighlight;
       if (selectedSquare === name) tile.material = highlight;
       if (checkedKing === name) tile.material = new THREE.MeshStandardMaterial({ color: "#b43a32", emissive: "#8f160d", emissiveIntensity: .55 });
