@@ -738,3 +738,48 @@ body {
   .brand-mark,.game-panel,.info-card,.tip-card { animation: diamondArrival .65s cubic-bezier(.2,.75,.25,1) both; }
   @keyframes diamondArrival { from { opacity:0; transform:translateY(9px) scale(.99); } to { opacity:1; transform:translateY(0) scale(1); } }
 }
+
+
+/* ROYAL DIAMOND SIGNATURE — crystal, sapphire and platinum */
+:root {
+  --gold: #e7c982;
+  --diamond-ice: #f2fdff;
+  --diamond-blue: #a9eaff;
+  --sapphire: #174b9b;
+  --platinum: #d9efff;
+}
+.brand-copy h1 {
+  font-family: "Cinzel", Georgia, serif;
+  font-size: clamp(18px, 2.6vw, 25px);
+  letter-spacing: .075em;
+}
+.eyebrow { letter-spacing: .22em; }
+.game-panel,.info-card,.tip-card {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.board-stage {
+  border-radius: 20px;
+  background:
+    radial-gradient(ellipse at 50% 0%, #e7faff38, transparent 48%),
+    linear-gradient(135deg,#dff8ff 0%,#397db6 18%,#102a55 52%,#7fc9ed 100%);
+  box-shadow:
+    0 0 0 1px #f4fdff,
+    0 0 0 5px #9ce4ff20,
+    0 0 42px #5ccaff35,
+    inset 0 2px 4px #fff,
+    inset 0 -16px 28px #020817b8,
+    0 24px 48px #000d;
+}
+.control-btn,.live-pill,.level-pill {
+  transition: transform .2s ease, filter .2s ease, box-shadow .2s ease;
+}
+.control-btn:active { transform: translateY(1px) scale(.985); }
+.live-pill { text-shadow: 0 0 12px #a9eaff55; }
+.footer-note { letter-spacing: .2em; }
+@media (max-width: 760px) {
+  #app { padding-left: 12px; padding-right: 12px; }
+  .layout { gap: 16px; padding-top: 17px; }
+  .topbar { gap: 10px; }
+  .brand-mark { width: 44px; height: 44px; }
+}
