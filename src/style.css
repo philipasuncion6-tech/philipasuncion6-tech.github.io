@@ -617,3 +617,124 @@ body {
 .promotion-box { background:linear-gradient(145deg,#1e3658,#101629);border-color:#a9e6ff; }
 .promotion-choice { background:linear-gradient(145deg,#25456a,#111b32);border-color:#75bce8;color:#e5f8ff; }
 .toast { background:linear-gradient(135deg,#e7faff,#91c9ee);color:#10243b;border-color:#fff; }
+
+
+/* =========================================
+   ROYAL CHESS: DIAMOND EDITION — SIGNATURE FINISH
+   ========================================= */
+:root {
+  --diamond-ice: #e9fbff;
+  --diamond-blue: #9ce4ff;
+  --sapphire: #2866b5;
+  --platinum: #c9e8f8;
+  --royal-night: #050a17;
+}
+html, body { background-color: var(--royal-night); }
+body {
+  background:
+    radial-gradient(ellipse at 50% -15%, rgba(72,169,235,.34), transparent 43%),
+    radial-gradient(ellipse at 3% 55%, rgba(49,95,190,.18), transparent 34%),
+    radial-gradient(ellipse at 100% 70%, rgba(111,80,220,.14), transparent 38%),
+    linear-gradient(145deg,#101f3b 0%,#050a17 54%,#11132d 100%);
+  background-attachment: fixed;
+}
+.topbar {
+  border-bottom: 1px solid rgba(190,235,255,.42);
+  filter: drop-shadow(0 8px 18px rgba(65,160,230,.12));
+}
+.topbar:after {
+  background: linear-gradient(90deg,transparent,#f1fdff 30%,#79d9ff 50%,#f1fdff 70%,transparent);
+  opacity: .9;
+}
+.brand-mark {
+  position: relative; overflow: hidden;
+  border: 1px solid #e5fbff;
+  background: linear-gradient(145deg,#dff8ff 0%,#4c9ed5 18%,#153d78 52%,#07142c 100%);
+  color: #f5fdff;
+  box-shadow: 0 0 0 3px #83dfff20, 0 0 28px #64cfff55, inset 0 1px #fff;
+}
+.brand-mark:after {
+  content:""; position:absolute; width:75px; height:12px; left:-20px; top:8px;
+  transform:rotate(-42deg); background:#fff8; filter:blur(5px);
+}
+.brand-copy h1 {
+  color:#f4fcff;
+  text-shadow:0 0 18px #80dfff35,0 2px 3px #000;
+}
+.brand-copy h1 span {
+  background:linear-gradient(100deg,#fff,#a9eaff 38%,#fff 62%,#75caff);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.eyebrow,.card-title,.title-icon { color:#c7efff; text-shadow:0 0 12px #70cfff30; }
+.live-pill,.level-pill {
+  border-color:#9bdfff; color:#e7faff;
+  background:linear-gradient(135deg,#173c66,#0b1932);
+  box-shadow:inset 0 1px #fff4,0 0 18px #62caff22;
+}
+.game-panel,.info-card,.tip-card {
+  position:relative; overflow:hidden;
+  border:1px solid rgba(166,224,255,.48);
+  background:linear-gradient(145deg,rgba(25,53,91,.97),rgba(7,15,34,.99) 70%);
+  box-shadow:0 24px 70px #000b,inset 0 1px #fff2,0 0 26px #4bbdff12;
+}
+.game-panel:before,.info-card:before {
+  content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
+  background:linear-gradient(125deg,#eafaff12,transparent 26%,transparent 72%,#70cfff0c);
+}
+.game-heading h2,.promotion-box h3 { color:#f1fbff; text-shadow:0 0 16px #78d5ff20; }
+.avatar { box-shadow:0 5px 18px #0008,inset 0 1px #fff8; }
+.ai-avatar { background:linear-gradient(145deg,#fff,#b8eaff 55%,#6caddb); color:#102d50; border:1px solid #fff; }
+.user-avatar { background:linear-gradient(145deg,#376fbd,#101d43); color:#e5f8ff; border:1px solid #a6e6ff; }
+.turn-tag.active { border-color:#a9eaff; color:#f0fcff; background:#62caff28; box-shadow:0 0 18px #67d3ff30; }
+.board-stage {
+  border:1px solid #e4fbff;
+  background:
+    linear-gradient(135deg,#ffffff2a,transparent 22%,transparent 78%,#8ddcff24),
+    linear-gradient(145deg,#5ba8db,#183d70 48%,#79bce8);
+  box-shadow:0 0 0 3px #7ddcff25,0 0 34px #54bfff2b,inset 0 1px #fff,inset 0 -12px 30px #000b,0 22px 44px #000c;
+}
+.board-stage:before {
+  border:1px solid #f0fdffb0;
+  box-shadow:inset 0 0 0 2px #8adfff20,0 0 18px #8bdfff20;
+}
+.board-stage:after {
+  color:#e8faffd9;
+  text-shadow:0 0 10px #64cfff,0 2px 5px #000;
+  letter-spacing:.32em;
+}
+.status-card {
+  border:1px solid #83d8ff70;
+  background:linear-gradient(105deg,#173f68,#0c1b37 60%,#172653);
+  box-shadow:inset 0 1px #fff2,0 8px 22px #0005;
+}
+.status-icon { color:#effcff; background:#8bdcff22; border:1px solid #b4ecff70; }
+.status-copy strong,.stat-line strong { color:#f4fcff; }
+.status-copy span,.stat-line span,.tip-card p { color:#c2d9ed; }
+.control-btn {
+  border:1px solid #78b8e3; color:#effaff;
+  background:linear-gradient(145deg,#214979,#101d3a);
+  box-shadow:inset 0 1px #fff2,0 7px 17px #0006;
+}
+.control-btn span { color:#c8f2ff; }
+.control-btn.primary {
+  color:#09203a; border-color:#fff;
+  background:linear-gradient(135deg,#fff,#c9f0ff 42%,#71bde8 100%);
+  box-shadow:inset 0 1px #fff,0 8px 24px #0007,0 0 22px #80dcff40;
+}
+.control-btn:hover { filter:brightness(1.14); box-shadow:0 0 18px #76d5ff30,0 8px 20px #0007; }
+.info-card,.tip-card { border-color:#79bfe955; }
+.card-title { letter-spacing:.2em; }
+.stat-line,.move-row { border-top-color:#b7e7ff20; }
+.white-notation { color:#fff; }
+.black-notation { color:#a9ddff; }
+.tip-card { background:linear-gradient(120deg,#214c78,#0b1934 80%); }
+.tip-card strong,.tip-symbol { color:#d8f5ff; }
+.footer-note { color:#9fc8e4; }
+.footer-note span { color:#e8fbff; }
+.promotion-box { background:linear-gradient(145deg,#1e4774,#0a1731);border-color:#c6efff; }
+.promotion-choice { background:linear-gradient(145deg,#27568a,#0d1c39);border-color:#82c9f0;color:#f1fbff; }
+.toast { background:linear-gradient(135deg,#f5fdff,#a8e3ff);color:#0b2340;border-color:#fff; }
+@media (prefers-reduced-motion:no-preference) {
+  .brand-mark,.game-panel,.info-card,.tip-card { animation: diamondArrival .65s cubic-bezier(.2,.75,.25,1) both; }
+  @keyframes diamondArrival { from { opacity:0; transform:translateY(9px) scale(.99); } to { opacity:1; transform:translateY(0) scale(1); } }
+}
