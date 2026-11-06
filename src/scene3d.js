@@ -82,7 +82,7 @@ export function createChessScene3D(host, onSquareClick) {
   const highlight = new THREE.MeshStandardMaterial({ color: "#e8bd55", roughness: 0.28, emissive: "#8a5a12", emissiveIntensity: 0.3 });
   const lastHighlight = new THREE.MeshStandardMaterial({ color: "#bda04f", roughness: 0.32, emissive: "#6e5217", emissiveIntensity: 0.22 });
   const targetMat = new THREE.MeshBasicMaterial({ color: "#60d58b", transparent: true, opacity: 0.62, depthWrite: false });
-  const captureMat = new THREE.MeshBasicMaterial({ color: "#f06b55", transparent: true, opacity: 0.75, side: THREE.DoubleSide });
+  const checkedSquare = new THREE.MeshStandardMaterial({ color: "#b43a32", emissive: "#8f160d", emissiveIntensity: .55 });
 
   const base = new THREE.Mesh(new THREE.BoxGeometry(8.55, 0.42, 8.55), wood);
   base.position.y = -0.04;
@@ -147,46 +147,53 @@ export function createChessScene3D(host, onSquareClick) {
   function makePiece(piece, square) {
     const group = new THREE.Group();
     const isWhite = piece.color === "w";
-    // White: deep emerald crystal. Black: glowing amber crystal.
+
+    // The two armies share the reference's amber / clear-glass language:
+    // one side is honey amber, the other is pale champagne crystal.
     const crystal = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#087653" : "#ff8a16",
-      metalness: 0.12,
-      roughness: 0.16,
-      transmission: 0.18,
-      thickness: 1.35,
-      ior: 1.48,
+      color: isWhite ? "#f5e8c9" : "#ff941f",
+      metalness: 0.04,
+      roughness: 0.105,
+      transmission: 0.42,
+      thickness: 1.7,
+      ior: 1.52,
       clearcoat: 1,
-      clearcoatRoughness: 0.045,
-      attenuationColor: isWhite ? "#064b38" : "#df5b08",
-      attenuationDistance: 2.4,
-      envMapIntensity: 1.8,
-      flatShading: true
+      clearcoatRoughness: 0.025,
+      attenuationColor: isWhite ? "#e8d5a9" : "#d95b08",
+      attenuationDistance: isWhite ? 4.8 : 1.65,
+      envMapIntensity: 2.25,
+      flatShading: false
     });
     const gold = new THREE.MeshStandardMaterial({
-      color: "#e8c77f",
+      color: "#f0d18b",
+      metalness: 0.92,
+      roughness: 0.16
+    });
+    const silver = new THREE.MeshStandardMaterial({
+      color: "#e8e1d2",
       metalness: 0.88,
       roughness: 0.2
     });
     const darkGold = new THREE.MeshStandardMaterial({
-      color: "#9c7138",
-      metalness: 0.82,
-      roughness: 0.25
+      color: "#95652d",
+      metalness: 0.9,
+      roughness: 0.22
     });
+    const trim = isWhite ? silver : gold;
 
-    // Turn each silhouette profile into a real faceted 3D lathed solid.
+    // A smooth, readable silhouette with enough facets to catch the light.
     const points = profiles[piece.type].map(([radius, height]) =>
       new THREE.Vector2(radius, height)
     );
     const body = new THREE.Mesh(
-      new THREE.LatheGeometry(points, 10),
+      new THREE.LatheGeometry(points, 32),
       crystal
     );
     body.castShadow = true;
     body.receiveShadow = true;
     group.add(body);
 
-    // Layered gold plinth and fine trim rings.
-    const addCylinder = (radiusTop, radiusBottom, height, y, material, sides = 12) => {
+    const addCylinder = (radiusTop, radiusBottom, height, y, material, sides = 32) => {
       const mesh = new THREE.Mesh(
         new THREE.CylinderGeometry(radiusTop, radiusBottom, height, sides, 1),
         material
@@ -195,14 +202,59 @@ export function createChessScene3D(host, onSquareClick) {
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       group.add(mesh);
+      return mesh;
     };
-    addCylinder(0.29, 0.32, 0.075, 0.055, gold);
-    addCylinder(0.25, 0.29, 0.045, 0.115, darkGold);
-    addCylinder(0.205, 0.22, 0.035, 0.19, gold);
+    const addRing = (radius, tube, y, material = trim) => {
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(radius, tube, 8, 40),
+        material
+      );
+      ring.rotation.x = Math.PI / 2;
+      ring.position.y = y;
+      ring.castShadow = true;
+      group.add(ring);
+      return ring;
+    };
 
-    // Piece-specific silhouettes and unmistakable crowns.
+    // Distinct stepped foot with bright, narrow metal inlays.
+    addCylinder(0.29, 0.325, 0.075, 0.055, gold);
+    addCylinder(0.255, 0.29, 0.045, 0.115, darkGold);
+    addCylinder(0.215, 0.235, 0.04, 0.17, trim);
+    addRing(0.294, 0.018, 0.09, trim);
+    addRing(0.238, 0.014, 0.19, gold);
+    addRing(0.205, 0.012, 0.235, trim);
+
+    // Fine decorative collars and scroll-like raised detailing make the
+    // pieces read as carved glass rather than plain chess tokens.
+    const collarY = piece.type === "p" ? 0.48 : piece.type === "n" ? 0.43 : 0.52;
+    addRing(piece.type === "p" ? 0.19 : 0.205, 0.014, collarY, gold);
+    addRing(piece.type === "p" ? 0.17 : 0.18, 0.009, collarY + 0.035, trim);
+
+    // Small paired scrolls on the front and back of the lower body.
+    for (const direction of [-1, 1]) {
+      const points = [];
+      for (let i = 0; i <= 18; i++) {
+        const t = i / 18;
+        const angle = t * Math.PI * 1.65;
+        const radius = 0.115 + t * 0.055;
+        points.push(new THREE.Vector3(
+          Math.cos(angle) * radius,
+          0.27 + t * 0.22,
+          direction * (0.165 + 0.012 * Math.sin(angle))
+        ));
+      }
+      const curve = new THREE.CatmullRomCurve3(points);
+      const scroll = new THREE.Mesh(
+        new THREE.TubeGeometry(curve, 28, 0.009, 5, false),
+        trim
+      );
+      scroll.castShadow = true;
+      group.add(scroll);
+    }
+
+    // Individual crowns keep every rank instantly recognizable at board scale.
     if (piece.type === "k") {
-      addCylinder(0.105, 0.13, 0.07, 0.73, gold);
+      addCylinder(0.11, 0.135, 0.07, 0.73, trim);
       const cross = new THREE.Group();
       const vertical = new THREE.Mesh(new THREE.BoxGeometry(0.065, 0.27, 0.065), gold);
       vertical.position.y = 0.91;
@@ -211,25 +263,24 @@ export function createChessScene3D(host, onSquareClick) {
       cross.add(vertical, horizontal);
       cross.traverse(o => { if (o.isMesh) o.castShadow = true; });
       group.add(cross);
+      addRing(0.14, 0.014, 0.79, gold);
     } else if (piece.type === "q") {
-      addCylinder(0.13, 0.16, 0.065, 0.74, gold);
+      addCylinder(0.135, 0.165, 0.065, 0.74, trim);
       for (let i = 0; i < 5; i++) {
         const a = (i / 5) * Math.PI * 2;
-        const gem = new THREE.Mesh(
-          new THREE.OctahedronGeometry(0.085, 0),
-          gold
-        );
+        const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.085, 0), gold);
         gem.position.set(Math.cos(a) * 0.19, 0.84, Math.sin(a) * 0.19);
         gem.castShadow = true;
         group.add(gem);
       }
-      const crown = new THREE.Mesh(new THREE.OctahedronGeometry(0.11, 0), crystal);
+      const crown = new THREE.Mesh(new THREE.OctahedronGeometry(0.11, 1), crystal);
       crown.position.y = 0.9;
       crown.castShadow = true;
       group.add(crown);
     } else if (piece.type === "r") {
-      addCylinder(0.22, 0.24, 0.075, 0.66, gold);
-      const merlons = new THREE.CylinderGeometry(0.055, 0.055, 0.14, 4);
+      addCylinder(0.22, 0.24, 0.075, 0.66, trim);
+      addRing(0.23, 0.014, 0.71, gold);
+      const merlons = new THREE.CylinderGeometry(0.055, 0.055, 0.14, 6);
       for (let i = 0; i < 4; i++) {
         const a = i * Math.PI / 2 + Math.PI / 4;
         const tooth = new THREE.Mesh(merlons, gold);
@@ -238,26 +289,35 @@ export function createChessScene3D(host, onSquareClick) {
         group.add(tooth);
       }
     } else if (piece.type === "b") {
-      const tip = new THREE.Mesh(new THREE.OctahedronGeometry(0.13, 0), gold);
+      const tip = new THREE.Mesh(new THREE.OctahedronGeometry(0.13, 1), gold);
       tip.position.y = 0.78;
       tip.castShadow = true;
       group.add(tip);
+      addRing(0.12, 0.012, 0.69, trim);
     } else if (piece.type === "n") {
-      const head = new THREE.Mesh(new THREE.OctahedronGeometry(0.2, 1), crystal);
+      const head = new THREE.Mesh(new THREE.OctahedronGeometry(0.2, 2), crystal);
       head.position.set(0, 0.61, -0.035);
       head.scale.set(0.8, 1.15, 0.72);
       head.rotation.z = -0.22;
       head.castShadow = true;
       group.add(head);
-      const ear = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.2, 5), gold);
+      const ear = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.2, 6), trim);
       ear.position.set(0.09, 0.78, -0.02);
       ear.castShadow = true;
       group.add(ear);
+      const mane = new THREE.Mesh(
+        new THREE.TorusGeometry(0.14, 0.025, 7, 24, Math.PI * 1.25),
+        gold
+      );
+      mane.position.set(0, 0.48, 0.035);
+      mane.rotation.set(0.3, 0, Math.PI * 0.15);
+      group.add(mane);
     } else if (piece.type === "p") {
-      const orb = new THREE.Mesh(new THREE.IcosahedronGeometry(0.13, 1), gold);
+      const orb = new THREE.Mesh(new THREE.IcosahedronGeometry(0.13, 2), crystal);
       orb.position.y = 0.69;
       orb.castShadow = true;
       group.add(orb);
+      addRing(0.13, 0.012, 0.56, gold);
     }
 
     const [file, rank] = ["abcdefgh".indexOf(square[0]), Number(square[1])];
@@ -358,7 +418,7 @@ export function createChessScene3D(host, onSquareClick) {
       tile.material = (Number(name[1]) + "abcdefgh".indexOf(name[0])) % 2 === 0 ? lightSquare : darkSquare;
       if (lastMove && (lastMove.from === name || lastMove.to === name)) tile.material = lastHighlight;
       if (selectedSquare === name) tile.material = highlight;
-      if (checkedKing === name) tile.material = new THREE.MeshStandardMaterial({ color: "#b43a32", emissive: "#8f160d", emissiveIntensity: .55 });
+      if (checkedKing === name) tile.material = checkedSquare;
     }
     const board = game.board();
     for (let row = 0; row < 8; row++) {
@@ -372,7 +432,7 @@ export function createChessScene3D(host, onSquareClick) {
     }
     for (const name of legalTargets) {
       const [file,rank] = ["abcdefgh".indexOf(name[0]),Number(name[1])];
-      const dot = new THREE.Mesh(new THREE.CircleGeometry(.14,24), targetMat);
+      const dot = new THREE.Mesh(new THREE.CircleGeometry(.14,24), targetMat.clone());
       dot.rotation.x = -Math.PI/2;
       dot.position.set(file-3.5,.315,4.5-rank);
       targetsGroup.add(dot);
