@@ -7,8 +7,8 @@ export function createChessScene3D(host, onSquareClick) {
   host.classList.add("three-board-host");
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color("#050914");
-  scene.fog = new THREE.Fog("#050914", 19, 36);
+  scene.background = new THREE.Color("#030817");
+  scene.fog = new THREE.Fog("#030817", 20, 38);
 
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
   camera.position.set(0, 10.5, 12.8);
@@ -44,8 +44,8 @@ export function createChessScene3D(host, onSquareClick) {
   controls.maxPolarAngle = Math.PI * 0.48;
   controls.target.set(0, 0.25, 0);
 
-  scene.add(new THREE.HemisphereLight(0xf0fbff, 0x111a35, 2.05));
-  const keyLight = new THREE.DirectionalLight(0xffffff, 3.25);
+  scene.add(new THREE.HemisphereLight(0xf7fcff, 0x101a38, 2.25));
+  const keyLight = new THREE.DirectionalLight(0xffffff, 3.7);
   keyLight.position.set(-5, 10, 7);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(1024, 1024);
@@ -57,17 +57,17 @@ export function createChessScene3D(host, onSquareClick) {
   keyLight.shadow.camera.top = 7;
   keyLight.shadow.camera.bottom = -7;
   scene.add(keyLight);
-  const fillLight = new THREE.DirectionalLight(0xb5e8ff, 1.65);
+  const fillLight = new THREE.DirectionalLight(0xb9dfff, 1.9);
   fillLight.position.set(6, 7, 4);
   scene.add(fillLight);
-  const rimLight = new THREE.PointLight(0x8de4ff, 52, 22);
+  const rimLight = new THREE.PointLight(0x9cecff, 58, 24);
   rimLight.position.set(5, 5, -5);
   scene.add(rimLight);
-  const warmLight = new THREE.PointLight(0x9aabff, 30, 20);
+  const warmLight = new THREE.PointLight(0x9bb8ff, 34, 22);
   warmLight.position.set(-5, 3, 5);
   scene.add(warmLight);
 
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: "#070d1d", roughness: 0.62, metalness: 0.24 }));
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: "#050b1c", roughness: 0.38, metalness: 0.42 }));
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = -0.34;
   floor.receiveShadow = true;
@@ -78,9 +78,9 @@ export function createChessScene3D(host, onSquareClick) {
   const targetsGroup = new THREE.Group();
   scene.add(boardGroup, piecesGroup, targetsGroup);
 
-  const wood = new THREE.MeshPhysicalMaterial({ color: "#102b55", roughness: 0.2, metalness: 0.78, clearcoat: 1, clearcoatRoughness: 0.08 });
-  const lightSquare = new THREE.MeshPhysicalMaterial({ color: "#f4fdff", roughness: 0.12, metalness: 0.12, clearcoat: 1, clearcoatRoughness: 0.045 });
-  const darkSquare = new THREE.MeshPhysicalMaterial({ color: "#123d78", roughness: 0.105, metalness: 0.38, emissive: "#123b75", emissiveIntensity: 0.16, clearcoat: 1, clearcoatRoughness: 0.035 });
+  const wood = new THREE.MeshPhysicalMaterial({ color: "#10264b", roughness: 0.16, metalness: 0.86, clearcoat: 1, clearcoatRoughness: 0.035 });
+  const lightSquare = new THREE.MeshPhysicalMaterial({ color: "#f8fdff", roughness: 0.075, metalness: 0.08, clearcoat: 1, clearcoatRoughness: 0.025 });
+  const darkSquare = new THREE.MeshPhysicalMaterial({ color: "#173c78", roughness: 0.07, metalness: 0.48, emissive: "#0c2454", emissiveIntensity: 0.1, clearcoat: 1, clearcoatRoughness: 0.02 });
   const highlight = new THREE.MeshStandardMaterial({ color: "#e8fbff", roughness: 0.12, metalness: 0.2, emissive: "#4ebfff", emissiveIntensity: 0.42 });
   const lastHighlight = new THREE.MeshStandardMaterial({ color: "#91e7ff", roughness: 0.14, metalness: 0.24, emissive: "#286caa", emissiveIntensity: 0.34 });
   const targetMat = new THREE.MeshBasicMaterial({ color: "#60d58b", transparent: true, opacity: 0.62, depthWrite: false });
@@ -110,7 +110,7 @@ export function createChessScene3D(host, onSquareClick) {
 
   const edge = new THREE.Mesh(
     new THREE.BoxGeometry(8.72, 0.12, 8.72),
-    new THREE.MeshStandardMaterial({ color: "#e7faff", metalness: 0.98, roughness: 0.1 })
+    new THREE.MeshStandardMaterial({ color: "#eaf5ff", metalness: 0.98, roughness: 0.075 })
   );
   edge.position.y = -0.25;
   boardGroup.add(edge);
