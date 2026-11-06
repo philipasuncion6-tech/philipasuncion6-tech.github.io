@@ -317,7 +317,7 @@ export function createChessScene3D(host, onSquareClick) {
     const point = new THREE.Vector3();
     if (!raycaster.ray.intersectPlane(boardPlane, point)) return;
     const file = Math.floor(point.x + 4);
-    const rank = 8 - Math.floor(4.5 - point.z);
+    const rank = Math.round(4.5 - point.z);
     if (file >= 0 && file < 8 && rank >= 1 && rank <= 8) {
       onSquareClick("abcdefgh"[file] + rank);
     }
