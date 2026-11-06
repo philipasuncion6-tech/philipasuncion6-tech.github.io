@@ -150,39 +150,37 @@ export function createChessScene3D(host, onSquareClick) {
     const group = new THREE.Group();
     const isWhite = piece.color === "w";
 
-    // Emerald crystal for the computer (White) and ruby crystal for the
-    // player (Black). Rich saturated color and crisp facets keep the gems
-    // readable on a phone instead of washing out like pale glass.
+    // Honey-amber crystal for the computer (White) and deep cognac amber for the player (Black), matching the supplied orange-gold glass reference.
     const crystal = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#00a84f" : "#c90032",
-      metalness: 0.12,
-      roughness: 0.16,
-      transmission: 0.055,
-      thickness: 1.7,
-      ior: isWhite ? 1.58 : 1.76,
+      color: isWhite ? "#ff9a16" : "#d94b08",
+      metalness: 0.08,
+      roughness: 0.075,
+      transmission: 0.34,
+      thickness: 2.4,
+      ior: 1.62,
       clearcoat: 1,
       clearcoatRoughness: 0.035,
-      attenuationColor: isWhite ? "#007b39" : "#8e001f",
-      attenuationDistance: isWhite ? 0.95 : 0.9,
-      envMapIntensity: 1.75,
-      emissive: isWhite ? "#003b1c" : "#45000e",
-      emissiveIntensity: 0.16,
+      attenuationColor: isWhite ? "#f07808" : "#a92b05",
+      attenuationDistance: isWhite ? 1.5 : 1.15,
+      envMapIntensity: 2.2,
+      emissive: isWhite ? "#612304" : "#4d1003",
+      emissiveIntensity: 0.12,
       flatShading: true
     });
     const gold = new THREE.MeshStandardMaterial({
-      color: "#f0d18b",
-      metalness: 0.92,
-      roughness: 0.16
+      color: "#f7c96e",
+      metalness: 0.96,
+      roughness: 0.12
     });
     const silver = new THREE.MeshStandardMaterial({
-      color: "#e8e1d2",
-      metalness: 0.88,
-      roughness: 0.2
+      color: "#f2e8d7",
+      metalness: 0.94,
+      roughness: 0.16
     });
     const darkGold = new THREE.MeshStandardMaterial({
-      color: "#95652d",
-      metalness: 0.9,
-      roughness: 0.22
+      color: "#9a4c13",
+      metalness: 0.94,
+      roughness: 0.17
     });
     const trim = isWhite ? silver : gold;
 
