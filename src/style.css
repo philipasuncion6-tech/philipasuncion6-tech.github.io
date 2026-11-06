@@ -340,3 +340,175 @@ body {
   .topbar { padding-bottom:18px; }
   .brand-mark { width:46px;height:46px; }
 }
+
+
+/* =========================================
+   ROYAL EDITION — COMPLETE INTERFACE PASS
+   ========================================= */
+:root {
+  --royal-ink: #09080b;
+  --royal-panel: #171319;
+  --royal-gold: #e8c987;
+  --royal-gold-soft: #b58a4e;
+  --royal-ivory: #f4ead6;
+}
+html { background: var(--royal-ink); }
+body {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(161,112,48,.2), transparent 42%),
+    radial-gradient(ellipse at 4% 48%, rgba(92,53,28,.13), transparent 35%),
+    linear-gradient(155deg,#171218 0%,#09080b 58%,#15100d 100%);
+  background-attachment: fixed;
+}
+#app { max-width: 1440px; padding-left: clamp(14px,3vw,42px); padding-right: clamp(14px,3vw,42px); }
+.topbar { min-height: 88px; gap: 17px; padding: 16px 2px 22px; }
+.brand-mark {
+  width: 58px; height: 58px; flex: 0 0 58px; border-radius: 17px;
+  background: linear-gradient(145deg,#6c4a24,#211710 58%,#0d0b0d);
+  border: 1px solid #d4ad70; color: #ffe7b0; font-size: 29px;
+  box-shadow: 0 0 0 4px #d8ae5c12, inset 0 1px #fff7, 0 12px 28px #0009;
+}
+.eyebrow { color: #d9b978; font-size: 9px; letter-spacing: .25em; }
+.brand-copy h1 { font: 700 clamp(21px,3vw,30px)/1.15 "Cinzel", Georgia, serif; letter-spacing: .09em; }
+.live-pill { margin-left: auto; border-color: #927044; color: #e7d1a7; background: #201910aa; padding: 9px 13px; }
+.layout { grid-template-columns: minmax(0,1.55fr) minmax(270px,.72fr); gap: clamp(16px,2.4vw,32px); padding-top: 25px; }
+.game-panel {
+  padding: clamp(15px,2.2vw,28px);
+  border: 1px solid #9e794b66;
+  border-radius: 24px;
+  background: linear-gradient(145deg,rgba(40,30,26,.97),rgba(17,14,17,.99) 66%);
+  box-shadow: 0 28px 75px #0009, inset 0 1px #fff1, 0 0 0 1px #e8c98708;
+}
+.game-heading { margin-bottom: 14px; }
+.game-heading h2 { font: 600 clamp(24px,3vw,34px)/1.1 "Cinzel",Georgia,serif; color: #f7ecd8; letter-spacing: .015em; }
+.level-pill { border-color: #9c7848; color: #f0d49c; background: linear-gradient(130deg,#5c4022aa,#201710aa); padding: 8px 12px; }
+.player-row { padding: 11px 5px; }
+.avatar { width: 44px; height: 44px; border-radius: 14px; font-size: 27px; }
+.ai-avatar { background: linear-gradient(145deg,#fff2d7,#c5a875); border: 1px solid #f5dcaa; color: #352515; }
+.user-avatar { background: linear-gradient(145deg,#70451f,#21150f); border: 1px solid #d2a75d; color: #ffdfa0; }
+.player-meta strong { color: #f4e8d4; font-size: 11px; letter-spacing: .16em; }
+.player-meta span { color: #b7a58a; font-size: 10px; }
+.turn-tag { border-color: #65533a; color: #b9a17c; border-radius: 20px; padding: 6px 10px; }
+.turn-tag.active { background: #bd8e4422; border-color: #d4ad70; color: #ffe0a2; box-shadow: 0 0 18px #d3a34b18; }
+.board-stage {
+  width: min(100%,720px);
+  aspect-ratio: 1 / 1.02;
+  margin: 8px auto 10px;
+  padding: 0;
+  border: 1px solid #e0bd7c;
+  border-radius: 17px;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 25%,#4a3425,#130e0c 76%);
+  box-shadow: 0 0 0 4px #b78c4b19, inset 0 1px #fff5, inset 0 -12px 30px #000b, 0 22px 42px #000b;
+}
+.board-stage:after {
+  content: "ASUNCION  •  ROYAL CHESS";
+  position: absolute; z-index: 2; left: 0; right: 0; bottom: 7px;
+  text-align: center; pointer-events: none;
+  color: #e6c789a8; font: 700 8px "Cinzel",Georgia,serif; letter-spacing: .28em;
+  text-shadow: 0 1px 4px #000;
+}
+.three-board-host { position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; }
+.three-board-host canvas { width: 100% !important; height: 100% !important; display: block; }
+.status-card {
+  border: 1px solid #9c78484d;
+  background: linear-gradient(110deg,#35271b,#1b1718 62%,#211b16);
+  border-radius: 14px; padding: 13px 15px;
+}
+.status-icon { background: linear-gradient(145deg,#8b632e66,#d2a34b22); border: 1px solid #c69a5555; color: #f5d99f; }
+.status-copy strong { color: #f3e6ce; font-size: 12px; }
+.status-copy span { color: #c0b19a; font-size: 10px; }
+.controls { gap: 9px; margin-top: 15px; }
+.control-btn {
+  min-height: 46px; border: 1px solid #79603c; border-radius: 11px;
+  background: linear-gradient(145deg,#30251c,#171417); color: #f1e5d1;
+  box-shadow: inset 0 1px #fff1, 0 7px 16px #0005;
+  font-size: 10px; letter-spacing: .025em;
+}
+.control-btn span { color: #f0ce8b; }
+.control-btn.primary {
+  color: #281b0d; border-color: #f0d49a;
+  background: linear-gradient(135deg,#f5dfa9,#d4ad6b 55%,#9b713b);
+  box-shadow: inset 0 1px #fff9, 0 8px 22px #0006, 0 0 20px #d5ad6720;
+}
+.control-btn:focus-visible { outline: 2px solid #ffe3a5; outline-offset: 3px; }
+.side-panel { gap: 15px; }
+.info-card,.tip-card {
+  border: 1px solid #92704455; border-radius: 18px;
+  background: linear-gradient(145deg,#29211d,#151317 70%);
+  box-shadow: 0 17px 40px #0006,inset 0 1px #fff1;
+  padding: 19px;
+}
+.card-title { color: #e8ca8e; font-size: 10px; letter-spacing: .18em; }
+.title-icon { color: #f0d49a; }
+.stat-line { border-top-color: #e4c68b18; padding: 12px 0; }
+.stat-line span { color: #b9aa95; }
+.stat-line strong { color: #f5ead8; }
+.history-card { min-height: 220px; }
+.empty-history { color: #a99b88; }
+.move-row { border-top-color: #e4c68b18; padding: 10px 5px; }
+.white-notation { color: #fff2d9; }
+.black-notation { color: #e5bf7e; }
+.tip-card { gap: 13px; background: linear-gradient(120deg,#3b2b1c,#1a1517 78%); }
+.tip-symbol { color: #f1cf8d; }
+.tip-card strong { color: #f0d49a; letter-spacing: .19em; }
+.tip-card p { color: #c4b59f; line-height: 1.65; }
+.footer-note { color: #9d8b70; letter-spacing: .2em; padding: 12px 4px; }
+.footer-note span { color: #e3bd7c; }
+.promotion-modal { background: #070507d9; backdrop-filter: blur(12px); }
+.promotion-box { background: linear-gradient(145deg,#3a2b20,#151217); border: 1px solid #d6b273; }
+.promotion-choice { background: linear-gradient(145deg,#4a3522,#1b1717); border-color: #987347; }
+@media (min-width: 1100px) {
+  .layout { align-items: stretch; }
+  .side-panel { padding-top: 2px; }
+}
+@media (max-width: 760px) {
+  #app { padding-left: 12px; padding-right: 12px; }
+  .layout { grid-template-columns: 1fr; gap: 14px; padding-top: 17px; }
+  .side-panel { display: grid; grid-template-columns: 1fr 1fr; }
+  .history-card { grid-row: span 2; }
+  .board-stage { aspect-ratio: 1 / 1.04; }
+}
+@media (max-width: 480px) {
+  .topbar { gap: 10px; padding-bottom: 16px; }
+  .brand-mark { width: 43px; height: 43px; flex-basis: 43px; font-size: 22px; border-radius: 13px; }
+  .eyebrow { font-size: 7px; letter-spacing: .16em; }
+  .brand-copy h1 { font-size: 17px; letter-spacing: .045em; }
+  .live-pill { font-size: 7px; padding: 6px 7px; }
+  .game-panel { padding: 13px 9px 14px; border-radius: 18px; }
+  .game-heading h2 { font-size: 22px; }
+  .level-pill { font-size: 7px; padding: 6px 7px; }
+  .board-stage { aspect-ratio: 1 / 1.08; border-radius: 12px; }
+  .board-stage:after { font-size: 6px; bottom: 5px; }
+  .controls { gap: 5px; }
+  .control-btn { min-height: 41px; font-size: 8px; padding: 0 4px; }
+  .control-btn span { margin-right: 2px; font-size: 14px; }
+  .side-panel { grid-template-columns: 1fr; }
+  .history-card { grid-row: auto; }
+  .info-card,.tip-card { padding: 15px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .control-btn { transition: transform .18s ease, filter .18s ease, box-shadow .18s ease; }
+  .control-btn:hover { transform: translateY(-2px); filter: brightness(1.08); }
+}
+
+/* WebGL canvas must replace the old 2D grid styling on #board. */
+.board-stage { position:relative; }
+.board-stage:before { z-index:3; pointer-events:none; }
+.three-board-host.chessboard {
+  position:absolute !important; inset:0 !important;
+  display:block !important; width:100% !important; height:100% !important;
+  min-height:0 !important; aspect-ratio:auto !important;
+  padding:0 !important; margin:0 !important;
+  border:0 !important; border-radius:inherit !important;
+  overflow:hidden !important; box-shadow:none !important;
+  background:transparent !important;
+}
+.three-board-host canvas {
+  position:absolute; inset:0; width:100% !important; height:100% !important;
+  display:block; touch-action:pan-y;
+}
+.board-stage:after { z-index:4; }
+@media (max-width:760px) {
+  .board-stage { width:min(100%,720px); }
+}
