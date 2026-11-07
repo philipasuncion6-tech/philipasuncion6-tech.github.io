@@ -57,6 +57,15 @@ let computerMoveToken = 0;
 let soundEnabled = true;
 let audioContext = null;
 
+// Keep expensive AI search off the Android UI thread.
+let aiWorker = null;
+try {
+  aiWorker = new Worker(new URL("./chess-ai.worker.js", import.meta.url), { type: "module" });
+} catch (error) {
+  console.warn("Chess AI worker is unavailable; using the compatibility fallback.", error);
+}
+
+
 // AI SETTINGS
 const MATE_SCORE = 100000;
 let AI_SEARCH_DEPTH = 3;
@@ -517,6 +526,44 @@ function chooseComputerMove() {
   ] || moves[0];
 }
 
+// Receive the AI result without blocking board animation or touch input.
+if (aiWorker) {
+  aiWorker.onmessage = (event) => {
+    const { token, move, error } = event.data || {};
+    if (token !== computerMoveToken) return;
+
+    let errorMessage = error || "";
+    try {
+      if (!errorMessage && move && !game.game_over() && game.turn() === "w") {
+        const played = game.move({
+          from: move.from,
+          to: move.to,
+          promotion: move.promotion || "q"
+        });
+        if (!played) throw new Error("Computer move was rejected.");
+        playSound(played.captured ? "capture" : game.in_check() ? "check" : "move");
+      } else if (!errorMessage && !move && !game.game_over()) {
+        throw new Error("No legal computer move found.");
+      }
+    } catch (caught) {
+      console.error("Computer AI error:", caught);
+      errorMessage = caught.message || "Computer AI error.";
+    } finally {
+      thinking = false;
+      clearSelection();
+      render();
+      if (errorMessage) showToast("Computer error: " + errorMessage);
+    }
+  };
+
+  aiWorker.onerror = (event) => {
+    console.error("Chess AI worker failed:", event);
+    thinking = false;
+    render();
+    showToast("Computer AI worker failed. Please start a new game.");
+  };
+}
+
 // ======================================
 // COMPUTER TURN
 // ======================================
@@ -540,30 +587,19 @@ function startComputerMove() {
     // Ignore an old delayed move after New Game or Undo.
     if (token !== computerMoveToken) return;
 
+    if (aiWorker) {
+      aiWorker.postMessage({ fen: game.fen(), depth: AI_SEARCH_DEPTH, token });
+      return;
+    }
+
+    // Compatibility fallback for browsers that do not support module workers.
     let errorMessage = "";
-
     try {
-      if (
-        !game.game_over() &&
-        game.turn() === "w"
-      ) {
-        const move = chooseComputerMove();
-
-        if (!move) {
-          throw new Error("No legal computer move found.");
-        }
-
-        const played = game.move({
-          from: move.from,
-          to: move.to,
-          promotion: move.promotion || "q"
-        });
-
-        if (!played) {
-          throw new Error("Computer move was rejected.");
-        }
-        playSound(played.captured ? "capture" : game.in_check() ? "check" : "move");
-      }
+      const move = chooseComputerMove();
+      if (!move) throw new Error("No legal computer move found.");
+      const played = game.move({ from: move.from, to: move.to, promotion: move.promotion || "q" });
+      if (!played) throw new Error("Computer move was rejected.");
+      playSound(played.captured ? "capture" : game.in_check() ? "check" : "move");
     } catch (error) {
       console.error("Computer AI error:", error);
       errorMessage = "Computer error: " + error.message;
@@ -572,10 +608,7 @@ function startComputerMove() {
         thinking = false;
         clearSelection();
         render();
-
-        if (errorMessage) {
-          showToast(errorMessage);
-        }
+        if (errorMessage) showToast(errorMessage);
       }
     }
   }, 250);
