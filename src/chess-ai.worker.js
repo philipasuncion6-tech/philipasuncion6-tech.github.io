@@ -17,10 +17,10 @@ let transpositionTable = new Map();
 let stopped = false;
 
 function evaluatePosition(position, ply = 0) {
-  if (position.isCheckmate()) {
+  if (position.in_checkmate()) {
     return position.turn() === "w" ? -MATE_SCORE + ply : MATE_SCORE - ply;
   }
-  if (position.isDraw()) return 0;
+  if (position.game_over()) return 0;
 
   let score = 0;
   const rows = position.board();
@@ -86,7 +86,7 @@ function checkTime() {
 function minimax(position, depth, alpha, beta, ply = 0) {
   checkTime();
 
-  if (position.isCheckmate() || position.isDraw()) {
+  if (position.in_checkmate() || position.game_over()) {
     return evaluatePosition(position, ply);
   }
   if (depth <= 0) return evaluatePosition(position, ply);
