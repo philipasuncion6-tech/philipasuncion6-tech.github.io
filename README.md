@@ -49,3 +49,16 @@ The `Deploy ASUNCION CHESS 3D to Pages` workflow builds the website with the roo
 - The app bundles chess.js with Vite, so chess rules work without a CDN connection.
 - Google Fonts are optional decoration; the game itself does not depend on a CDN for chess logic.
 - The computer opponent uses a small alpha-beta material/position search. It is a casual opponent, not a tournament-strength engine.
+
+
+## Pi Network Sandbox
+The web app loads the official Pi Network JavaScript SDK and initializes it with `Pi.init({ version: "2.0", sandbox: true })`. This enables Sandbox testing only; this build does not request Pioneer authentication or initiate Pi payments.
+
+To run it in Pi Sandbox:
+1. Open Pi Browser and visit the Pi Developer Portal at `develop.pinet.com`.
+2. Register a **Testnet** app and configure its Development URL according to the current Pi Developer Portal checklist.
+3. Open the generated Sandbox URL (typically `https://sandbox.minepi.com`) in a desktop browser.
+4. In the Pi app, open **Pi Utilities** → **Authorize Sandbox**, then enter the authorization code shown by Sandbox.
+5. Test the chess game. The game remains playable if the Pi SDK is unavailable, but Pi SDK features require the authorized Sandbox environment.
+
+Official documentation: https://developers.minepi.com/docs/build-first-app/Sandbox
