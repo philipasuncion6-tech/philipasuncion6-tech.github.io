@@ -1000,3 +1000,40 @@ body {
 .brand-mark::before, .brand-mark::after {
   filter: none !important;
 }
+
+
+/* OPTIONAL PI ACCOUNT — guest play stays available without sign-in */
+.pi-account {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin:16px 0 0;
+  padding:13px 16px;
+  border:1px solid rgba(226,202,157,.3);
+  border-radius:14px;
+  background:linear-gradient(120deg,rgba(31,35,43,.96),rgba(12,16,24,.98));
+  box-shadow:0 10px 26px rgba(0,0,0,.22),inset 0 1px rgba(255,248,231,.06);
+}
+.pi-account-copy { display:flex; flex-direction:column; gap:4px; min-width:0; }
+.pi-account-copy strong { color:#e8ce98; font-size:10px; letter-spacing:.18em; }
+.pi-account-copy span { color:#c7c1b4; font-size:12px; line-height:1.4; overflow-wrap:anywhere; }
+.pi-connect-btn {
+  flex:0 0 auto;
+  min-height:40px;
+  padding:9px 14px;
+  border:1px solid #e5d2a3;
+  border-radius:10px;
+  background:linear-gradient(135deg,#f1e4c5,#c9aa70 58%,#8f7045);
+  color:#171820;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.08em;
+  cursor:pointer;
+}
+.pi-connect-btn:disabled { opacity:.65; cursor:wait; }
+.pi-connect-btn:focus-visible { outline:2px solid #fff2cf; outline-offset:3px; }
+@media (max-width:520px) {
+  .pi-account { align-items:stretch; flex-direction:column; }
+  .pi-connect-btn { width:100%; }
+}
