@@ -1,6 +1,7 @@
-// Pi Network SDK bootstrap for ASUNCION CHESS.
-// This build is configured for Pi Sandbox testing only. It does not request
-// authentication scopes, create payments, or handle any wallet credentials.
+// Pi Network SDK bootstrap and optional username sign-in for ASUNCION CHESS.
+// Sandbox only. This module does not create payments or access wallet credentials.
+
+let initializationPromise = null;
 
 function setPiBadge(label) {
   const badge = document.querySelector(".live-pill");
@@ -30,15 +31,43 @@ function loadPiSdk() {
   });
 }
 
-export async function initializePiSandbox() {
-  setPiBadge("PI SANDBOX • CONNECTING");
-  const pi = await loadPiSdk();
+export function initializePiSandbox() {
+  if (!initializationPromise) {
+    initializationPromise = (async () => {
+      setPiBadge("PI SANDBOX • CONNECTING");
+      const pi = await loadPiSdk();
 
-  if (typeof pi.init !== "function") {
-    throw new Error("Pi.init is not available in this SDK.");
+      if (typeof pi.init !== "function") {
+        throw new Error("Pi.init is not available in this SDK.");
+      }
+
+      await pi.init({ version: "2.0", sandbox: true });
+      setPiBadge("PI SANDBOX • READY");
+      return pi;
+    })().catch((error) => {
+      initializationPromise = null;
+      throw error;
+    });
   }
 
-  await pi.init({ version: "2.0", sandbox: true });
-  setPiBadge("PI SANDBOX • READY");
-  return true;
+  return initializationPromise;
+}
+
+// The username is returned for display only. Production identity checks must
+// be performed by a trusted backend using the access token and Pi Platform API.
+export async function authenticatePiUser() {
+  const pi = await initializePiSandbox();
+
+  if (typeof pi.authenticate !== "function") {
+    throw new Error("Pi authentication is unavailable in this browser.");
+  }
+
+  const authResult = await pi.authenticate(["username"], () => {});
+  const username = authResult?.user?.username;
+
+  if (!username) {
+    throw new Error("Pi did not return a username. Please try again.");
+  }
+
+  return username;
 }
