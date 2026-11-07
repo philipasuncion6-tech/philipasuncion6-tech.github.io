@@ -248,13 +248,6 @@ function makePlayerMove(from, to, promotion = "q") {
   if (!game.game_over()) {
     startComputerMove();
 
-// Initialize the official Pi SDK in Sandbox mode. The chess game remains
-// fully playable if the SDK is unavailable outside Pi Sandbox.
-initializePiSandbox().catch((error) => {
-  console.warn("Pi Sandbox is not active; chess remains playable.", error);
-  const badge = document.querySelector(".live-pill");
-  if (badge) badge.innerHTML = "<i></i> CHESS OFFLINE READY";
-});
   }
 }
 
@@ -821,3 +814,12 @@ closePromotion();
 
 render();
 startComputerMove();
+
+
+// Initialize the official Pi SDK in Sandbox mode. The chess game remains
+// fully playable if the SDK is unavailable outside Pi Sandbox.
+initializePiSandbox().catch((error) => {
+  console.warn("Pi Sandbox is not active; chess remains playable.", error);
+  const badge = document.querySelector(".live-pill");
+  if (badge) badge.innerHTML = "<i></i> CHESS OFFLINE READY";
+});
