@@ -1,7 +1,7 @@
 import chessPackage from "chess.js";
 import "./style.css";
 import { createChessScene3D } from "./scene3d.js";
-import { initializePiSandbox } from "./pi-sandbox.js";
+import { initializePiSandbox, authenticatePiUser } from "./pi-sandbox.js";
 
 const Chess =
   chessPackage.Chess ||
@@ -818,6 +818,31 @@ startComputerMove();
 
 // Initialize the official Pi SDK in Sandbox mode. The chess game remains
 // fully playable if the SDK is unavailable outside Pi Sandbox.
+const piConnectButton = $("pi-connect");
+const piAccountStatus = $("pi-account-status");
+
+piConnectButton?.addEventListener("click", async () => {
+  if (piConnectButton.disabled) return;
+
+  piConnectButton.disabled = true;
+  piConnectButton.textContent = "CONNECTING…";
+  piAccountStatus.textContent = "Waiting for Pi Browser approval…";
+
+  try {
+    const username = await authenticatePiUser();
+    piAccountStatus.textContent = "Pi username: @" + username + " • Sandbox display";
+    piConnectButton.textContent = "PI ACCOUNT CONNECTED";
+    showToast("Welcome, @" + username + "!");
+  } catch (error) {
+    console.warn("Optional Pi sign-in was not completed.", error);
+    piAccountStatus.textContent = "Guest mode is still available. You can try Pi login again.";
+    piConnectButton.textContent = "CONNECT PI ACCOUNT";
+    showToast("Pi login cancelled or unavailable. Chess is still playable.");
+  } finally {
+    piConnectButton.disabled = false;
+  }
+});
+
 initializePiSandbox().catch((error) => {
   console.warn("Pi Sandbox is not active; chess remains playable.", error);
   const badge = document.querySelector(".live-pill");
