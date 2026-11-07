@@ -1031,7 +1031,7 @@ body {
   letter-spacing:.08em;
   cursor:pointer;
 }
-.pi-connect-btn:disabled { opacity:.65; cursor:wait; }
+.pi-connect-btn:disabled { opacity:.65; cursor:not-allowed; }
 .pi-connect-btn:focus-visible { outline:2px solid #fff2cf; outline-offset:3px; }
 @media (max-width:520px) {
   .pi-account { align-items:stretch; flex-direction:column; }

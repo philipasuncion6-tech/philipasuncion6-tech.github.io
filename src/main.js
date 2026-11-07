@@ -1,4 +1,5 @@
 import chessPackage from "chess.js";
+import { Capacitor } from "@capacitor/core";
 import "./style.css";
 import { createChessScene3D } from "./scene3d.js";
 import { initializePiSandbox, authenticatePiUser } from "./pi-sandbox.js";
@@ -816,35 +817,55 @@ render();
 startComputerMove();
 
 
-// Initialize the official Pi SDK in Sandbox mode. The chess game remains
-// fully playable if the SDK is unavailable outside Pi Sandbox.
+// Pi Sandbox sign-in is currently supported in Pi Browser, not in the
+// embedded Android WebView used by this Capacitor APK. Keep Android usable
+// without leaving users stuck on an approval screen.
 const piConnectButton = $("pi-connect");
 const piAccountStatus = $("pi-account-status");
+const isNativeAndroid =
+  Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
 
-piConnectButton?.addEventListener("click", async () => {
-  if (piConnectButton.disabled) return;
-
-  piConnectButton.disabled = true;
-  piConnectButton.textContent = "CONNECTING…";
-  piAccountStatus.textContent = "Waiting for Pi Browser approval…";
-
-  try {
-    const username = await authenticatePiUser();
-    piAccountStatus.textContent = "Pi username: @" + username + " • Sandbox display";
-    piConnectButton.textContent = "PI ACCOUNT CONNECTED";
-    showToast("Welcome, @" + username + "!");
-  } catch (error) {
-    console.warn("Optional Pi sign-in was not completed.", error);
-    piAccountStatus.textContent = "Guest mode is still available. You can try Pi login again.";
-    piConnectButton.textContent = "CONNECT PI ACCOUNT";
-    showToast("Pi login cancelled or unavailable. Chess is still playable.");
-  } finally {
-    piConnectButton.disabled = false;
-  }
-});
-
-initializePiSandbox().catch((error) => {
-  console.warn("Pi Sandbox is not active; chess remains playable.", error);
+if (isNativeAndroid) {
   const badge = document.querySelector(".live-pill");
-  if (badge) badge.innerHTML = "<i></i> CHESS OFFLINE READY";
-});
+  if (badge) badge.innerHTML = "<i></i> ANDROID • GUEST MODE";
+  if (piAccountStatus) {
+    piAccountStatus.textContent =
+      "Pi sign-in is not enabled in this Android build yet. You can play in Guest Mode.";
+  }
+  if (piConnectButton) {
+    piConnectButton.disabled = true;
+    piConnectButton.textContent = "PI LOGIN COMING LATER";
+    piConnectButton.setAttribute(
+      "aria-label",
+      "Pi login is not available in this Android build. Guest Mode is ready."
+    );
+  }
+} else {
+  piConnectButton?.addEventListener("click", async () => {
+    if (piConnectButton.disabled) return;
+
+    piConnectButton.disabled = true;
+    piConnectButton.textContent = "CONNECTING…";
+    piAccountStatus.textContent = "Waiting for Pi Browser approval…";
+
+    try {
+      const username = await authenticatePiUser();
+      piAccountStatus.textContent = "Pi username: @" + username + " • Sandbox display";
+      piConnectButton.textContent = "PI ACCOUNT CONNECTED";
+      showToast("Welcome, @" + username + "!");
+    } catch (error) {
+      console.warn("Optional Pi sign-in was not completed.", error);
+      piAccountStatus.textContent = "Guest mode is still available. You can try Pi login again.";
+      piConnectButton.textContent = "CONNECT PI ACCOUNT";
+      showToast("Pi login cancelled or unavailable. Chess is still playable.");
+    } finally {
+      piConnectButton.disabled = false;
+    }
+  });
+
+  initializePiSandbox().catch((error) => {
+    console.warn("Pi Sandbox is not active; chess remains playable.", error);
+    const badge = document.querySelector(".live-pill");
+    if (badge) badge.innerHTML = "<i></i> CHESS OFFLINE READY";
+  });
+}
