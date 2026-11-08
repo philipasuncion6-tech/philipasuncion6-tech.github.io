@@ -64,7 +64,7 @@ jobs:
             convert -background none public/asuncion-chess-icon.svg -resize "${size}x${size}" "$RES/mipmap-$density/ic_launcher.png"
             cp "$RES/mipmap-$density/ic_launcher.png" "$RES/mipmap-$density/ic_launcher_round.png"
           done
-          cat > "$RES/values/ic_launcher.xml" <<'EOF'
+          cat > "$RES/values/ic_launcher_background.xml" <<'EOF'
           <resources><color name="ic_launcher_background">#08110C</color></resources>
           EOF
           cat > "$RES/mipmap-anydpi-v26/ic_launcher.xml" <<'EOF'
