@@ -51,6 +51,9 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Install dependencies
         run: npm install
 
@@ -62,6 +65,20 @@ jobs:
 
       - name: Sync Android project
         run: npx cap sync android
+
+      - name: Configure Gradle wrapper download timeout
+        working-directory: android
+        run: |
+          # Use the smaller binary distribution and the direct Gradle download host.
+          # The services.gradle.org URL redirects to GitHub Releases, which returned
+          # HTTP 504 on the hosted runner. Keep a longer timeout for slower runners.
+          sed -i 's#https\\://services.gradle.org/distributions/gradle-8.2.1-all.zip#https\\://downloads.gradle.org/distributions/gradle-8.2.1-bin.zip#' gradle/wrapper/gradle-wrapper.properties
+          if grep -q '^networkTimeout=' gradle/wrapper/gradle-wrapper.properties; then
+            sed -i 's/^networkTimeout=.*/networkTimeout=120000/' gradle/wrapper/gradle-wrapper.properties
+          else
+            printf '\nnetworkTimeout=120000\n' >> gradle/wrapper/gradle-wrapper.properties
+          fi
+          grep -E 'distributionUrl|networkTimeout' gradle/wrapper/gradle-wrapper.properties
 
       - name: Apply Pearl Royale Android launcher icon
         run: |
