@@ -1037,3 +1037,120 @@ body {
   .pi-account { align-items:stretch; flex-direction:column; }
   .pi-connect-btn { width:100%; }
 }
+
+
+/* PEARL ROYALE — premium Android fallback board.
+   Used only when WebGL/Three.js cannot initialize; chess logic is untouched. */
+#board.fallback-luxury-board {
+  display: grid !important;
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  aspect-ratio: auto !important;
+  grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(8, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  padding: 7px !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  background:
+    linear-gradient(135deg, #f7e7c5, #9b713b 13%, #17131b 18%, #080d19 82%, #d9b56f 94%, #fff1cf) !important;
+  box-shadow: inset 0 0 0 1px #fff8, inset 0 0 0 4px #b88c4b55, 0 10px 28px #000b !important;
+}
+#board.fallback-luxury-board .square {
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid rgba(225, 204, 164, .14);
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+#board.fallback-luxury-board .sq-light {
+  background:
+    radial-gradient(ellipse at 28% 22%, rgba(255,255,255,.96), transparent 54%),
+    linear-gradient(145deg, #fff9e9 0%, #e7dcc8 48%, #c6b69c 100%);
+  box-shadow: inset 1px 1px 0 #fff9, inset -2px -2px 5px #8d7c642b;
+}
+#board.fallback-luxury-board .sq-dark {
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(111,153,198,.20), transparent 52%),
+    linear-gradient(145deg, #27364d 0%, #111b2d 48%, #060b16 100%);
+  box-shadow: inset 1px 1px 0 #a9dfff24, inset -2px -2px 5px #000a;
+}
+#board.fallback-luxury-board .piece {
+  isolation: isolate;
+  width: 88%;
+  height: 88%;
+  display: grid;
+  place-items: center;
+  font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "DejaVu Sans", serif;
+  font-size: clamp(23px, 6.1vw, 54px);
+  line-height: 1;
+  transform: translateY(-1px);
+  filter: drop-shadow(0 5px 3px rgba(0,0,0,.58));
+}
+#board.fallback-luxury-board .piece::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 76%;
+  height: 76%;
+  bottom: 2%;
+  border-radius: 48% 48% 42% 42%;
+  border: 1px solid rgba(226,194,128,.58);
+  background:
+    radial-gradient(ellipse at 32% 17%, rgba(255,255,255,.72), transparent 28%),
+    linear-gradient(145deg, rgba(255,255,255,.24), rgba(255,255,255,.025) 48%, rgba(0,0,0,.28));
+  box-shadow: inset 0 2px 4px rgba(255,255,255,.3), 0 3px 7px rgba(0,0,0,.42);
+}
+#board.fallback-luxury-board .white-piece {
+  color: #fffdf5;
+  -webkit-text-stroke: .45px #b9a77e;
+  text-shadow: 0 1px 0 #fff, 0 3px 1px #8d8068, 0 6px 5px #000b;
+}
+#board.fallback-luxury-board .white-piece::before {
+  border-color: #fff0c4;
+  background:
+    radial-gradient(ellipse at 28% 18%, #fff 0%, #fff9e9 22%, transparent 45%),
+    linear-gradient(145deg, #f9f0dc, #c8b48d 62%, #89734f);
+}
+#board.fallback-luxury-board .black-piece {
+  color: #172033;
+  -webkit-text-stroke: .5px #a8c8e2;
+  text-shadow: 0 1px 0 #d7edff, 0 3px 1px #31445c, 0 6px 6px #000;
+}
+#board.fallback-luxury-board .black-piece::before {
+  border-color: #a9dfff;
+  background:
+    radial-gradient(ellipse at 28% 18%, #7ea8d2 0%, #263b59 25%, transparent 48%),
+    linear-gradient(145deg, #425875, #14233b 58%, #050a14);
+  box-shadow: inset 0 2px 5px #d7f2ff55, 0 3px 8px #000b, 0 0 8px #77cfff20;
+}
+#board.fallback-luxury-board .square.last-move::after {
+  background: rgba(225,190,103,.30);
+  box-shadow: inset 0 0 0 2px #f3d58b;
+}
+#board.fallback-luxury-board .square.selected::after {
+  background: rgba(119,207,255,.28);
+  box-shadow: inset 0 0 0 3px #bdeeff;
+}
+#board.fallback-luxury-board .move-target::before {
+  width: 22%;
+  height: 22%;
+  background: radial-gradient(circle, #b8f0ff 0%, #4c9ed4 55%, #153c70 100%);
+  box-shadow: 0 0 12px #75d6ffb0;
+}
+#board.fallback-luxury-board .capture-target::before {
+  inset: 5%;
+  border: 3px solid #f0c879;
+  box-shadow: inset 0 0 12px #f0c87955, 0 0 10px #f0c87988;
+}
+#board.fallback-luxury-board .in-check {
+  box-shadow: inset 0 0 0 4px #ff5c66, inset 0 0 18px #ff263b88;
+}
+@media (max-width: 480px) {
+  #board.fallback-luxury-board { padding: 5px !important; }
+  #board.fallback-luxury-board .piece { font-size: clamp(20px, 6.5vw, 34px); }
+}
