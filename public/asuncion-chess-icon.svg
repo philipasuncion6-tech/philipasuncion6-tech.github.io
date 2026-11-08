@@ -1,20 +1,49 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
 <defs>
- <linearGradient id="bg" x2="0" y2="1"><stop stop-color="#18221d"/><stop offset="1" stop-color="#030806"/></linearGradient>
- <linearGradient id="emerald" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d5fff0"/><stop offset=".25" stop-color="#24e69a"/><stop offset=".65" stop-color="#087b50"/><stop offset="1" stop-color="#023c2a"/></linearGradient>
- <linearGradient id="ruby" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe0e7"/><stop offset=".25" stop-color="#ff4268"/><stop offset=".7" stop-color="#a20d35"/><stop offset="1" stop-color="#51051b"/></linearGradient>
- <linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff0b5"/><stop offset=".5" stop-color="#d6ad58"/><stop offset="1" stop-color="#76501d"/></linearGradient>
+ <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#78d7ff"/><stop offset=".52" stop-color="#e9fbff"/><stop offset="1" stop-color="#fff0bd"/></linearGradient>
+ <radialGradient id="sun"><stop stop-color="#fff"/><stop offset=".35" stop-color="#fff9c7"/><stop offset="1" stop-color="#ffc83d" stop-opacity="0"/></radialGradient>
+ <linearGradient id="gold" x2=".2" y2="1"><stop stop-color="#fffbd0"/><stop offset=".25" stop-color="#ffdf65"/><stop offset=".58" stop-color="#d99516"/><stop offset=".82" stop-color="#fff0a2"/><stop offset="1" stop-color="#9b5a08"/></linearGradient>
+ <linearGradient id="green" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eaffff"/><stop offset=".2" stop-color="#62ffd0"/><stop offset=".48" stop-color="#00c878"/><stop offset=".72" stop-color="#00804f"/><stop offset="1" stop-color="#00432f"/></linearGradient>
+ <linearGradient id="red" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff4fa"/><stop offset=".2" stop-color="#ff9db9"/><stop offset=".48" stop-color="#ff315c"/><stop offset=".72" stop-color="#c90039"/><stop offset="1" stop-color="#650020"/></linearGradient>
+ <linearGradient id="board" x2="0" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#d7e7ee"/></linearGradient>
+ <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feGaussianBlur stdDeviation="9"/></filter>
 </defs>
-<rect width="512" height="512" rx="112" fill="url(#bg)"/>
-<rect x="17" y="17" width="478" height="478" rx="98" fill="none" stroke="url(#gold)" stroke-width="9"/>
-<path d="M256 76 405 150v126c0 93-61 139-149 174-88-35-149-81-149-174V150z" fill="#0b1510" stroke="url(#gold)" stroke-width="10"/>
-<path d="M256 93 389 158v118c0 75-49 118-133 153z" fill="url(#emerald)" opacity=".95"/>
-<path d="M256 93 123 158v118c0 75 49 118 133 153z" fill="url(#ruby)" opacity=".95"/>
-<path d="M256 93v336" stroke="#f5d78f" stroke-width="5" opacity=".9"/>
-<path d="M169 306c13-18 22-36 25-56l-20-31 17-50 40 31 31-8 21-39 45 15-9 43 30 36-10 42-36 10-22 37H174z" fill="#07100c" stroke="url(#gold)" stroke-width="11" stroke-linejoin="round"/>
-<path d="m194 219 26-34 24 22-13 30z" fill="url(#emerald)" stroke="#e4fff2" stroke-width="5"/>
-<path d="m280 188 31-27 29 17-10 36-29 4z" fill="url(#ruby)" stroke="#ffe4eb" stroke-width="5"/>
-<path d="M173 324h166l29 35H144z" fill="url(#gold)" stroke="#fff0bf" stroke-width="5"/>
-<path d="m192 132 21-31 23 23 20-38 22 38 24-23 18 31-64 24z" fill="url(#gold)" stroke="#fff0bf" stroke-width="5" stroke-linejoin="round"/>
-<circle cx="256" cy="144" r="8" fill="#fff8db"/>
+<rect width="512" height="512" rx="112" fill="url(#sky)"/>
+<circle cx="88" cy="94" r="110" fill="url(#sun)"/>
+<path d="M0 340 90 270l80 45 82-70 85 66 90-58 85 62v197H0z" fill="#b4e8a1"/>
+<path d="M0 390 110 326l85 50 70-55 105 61 78-49 64 34v145H0z" fill="#55b979" opacity=".7"/>
+<rect x="13" y="13" width="486" height="486" rx="100" fill="none" stroke="url(#gold)" stroke-width="12"/>
+<path d="M86 397 256 330l170 67-170 69z" fill="#74501e" opacity=".25" filter="url(#shadow)"/>
+<!-- sunlit checkerboard -->
+<path d="M70 366 256 300l186 66-186 80z" fill="url(#board)" stroke="url(#gold)" stroke-width="8"/>
+<path d="m163 333 93 33-93 34-93-34z M349 333l93 33-93 34-93-34z" fill="#174c43" opacity=".88"/>
+<path d="m256 366 93 34-93 46-93-46z" fill="#d9b45d"/>
+<path d="m256 366 93 34-93 46z" fill="#fff"/>
+<!-- emerald king -->
+<ellipse cx="166" cy="355" rx="85" ry="18" fill="#063e2b" opacity=".22"/>
+<path d="M103 330h126l-12 24H115z" fill="url(#gold)" stroke="#fff2a9" stroke-width="4"/>
+<path d="M119 326 131 283l-9-37 20-42 24 22 24-22 20 42-9 37 12 43z" fill="url(#green)" stroke="#e4fff8" stroke-width="6" stroke-linejoin="round"/>
+<path d="m131 283 35-57 24 57-24 43z" fill="#a6ffe6" opacity=".7"/>
+<path d="m122 246 20-42 24 22-7 57z" fill="#fff" opacity=".35"/>
+<path d="m166 226 24 22 20-42-24-22z" fill="#006b48" opacity=".7"/>
+<path d="M107 326h118l-17 18H124z" fill="url(#gold)" stroke="#fff2a9" stroke-width="4"/>
+<!-- ruby king, identical silhouette -->
+<ellipse cx="346" cy="355" rx="85" ry="18" fill="#65001d" opacity=".2"/>
+<path d="M283 330h126l-12 24H295z" fill="url(#gold)" stroke="#fff2a9" stroke-width="4"/>
+<path d="M299 326 311 283l-9-37 20-42 24 22 24-22 20 42-9 37 12 43z" fill="url(#red)" stroke="#fff0f5" stroke-width="6" stroke-linejoin="round"/>
+<path d="m311 283 35-57 24 57-24 43z" fill="#ffd3e0" opacity=".7"/>
+<path d="m302 246 20-42 24 22-7 57z" fill="#fff" opacity=".35"/>
+<path d="m346 226 24 22 20-42-24-22z" fill="#97002d" opacity=".7"/>
+<path d="M287 326h118l-17 18H304z" fill="url(#gold)" stroke="#fff2a9" stroke-width="4"/>
+<!-- crown -->
+<path d="m176 147 12-48 35 32 33-68 33 68 35-32 12 48-80 24z" fill="url(#gold)" stroke="#fff8ca" stroke-width="7" stroke-linejoin="round"/>
+<path d="m223 131 33-68v108z" fill="#fff4ad" opacity=".72"/>
+<path d="m256 171 80-24-12 24-68 16z" fill="#9b5a08" opacity=".55"/>
+<path d="M183 174h146l-15 23H198z" fill="url(#gold)" stroke="#fff4bd" stroke-width="5"/>
+<path d="m242 129 14-28 14 28-14 20z" fill="url(#green)" stroke="#efffff" stroke-width="3"/>
+<path d="m191 145 13-18 13 18-13 15z" fill="url(#red)" stroke="#fff" stroke-width="3"/>
+<path d="m295 145 13-18 13 18-13 15z" fill="url(#red)" stroke="#fff" stroke-width="3"/>
+<!-- bright crystal glints -->
+<path d="m110 202 7 18 18 7-18 7-7 18-7-18-18-7 18-7z M402 206l6 16 16 6-16 6-6 16-6-16-16-6 16-6z" fill="#fff"/>
+<path d="M70 75 76 91 92 97 76 103 70 119 64 103 48 97 64 91z" fill="#fff8d5"/>
 </svg>
