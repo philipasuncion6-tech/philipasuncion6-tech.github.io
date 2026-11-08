@@ -540,6 +540,15 @@ function chooseComputerMove() {
 
 // If the module worker fails, keep the game playable with the built-in AI.
 function runCompatibilityFallback(token, notify = false) {
+  // A delayed worker error must never make a move for a newer game or the wrong side.
+  if (token !== computerMoveToken || game.game_over() || game.turn() !== "w") {
+    if (token === computerMoveToken) {
+      thinking = false;
+      render();
+    }
+    return;
+  }
+
   let errorMessage = "";
   try {
     const move = chooseComputerMove();
