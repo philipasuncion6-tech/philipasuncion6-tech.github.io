@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 
 export function createChessScene3D(host, onSquareClick) {
   host.innerHTML = "";
@@ -19,12 +20,17 @@ export function createChessScene3D(host, onSquareClick) {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.NoToneMapping;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.12;
   renderer.transmissionResolutionScale = 1;
   host.appendChild(renderer.domElement);
 
-  // Keep the scene environment neutral on Android WebView. Direct studio lights
-  // create controlled highlights without the hazy RoomEnvironment reflection.
+  // A compact studio environment gives the crystal surfaces real reflected highlights
+  // on Android WebView as well as desktop browsers.
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const studioEnvironment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environment = studioEnvironment;
+  pmrem.dispose();
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
@@ -283,33 +289,34 @@ export function createChessScene3D(host, onSquareClick) {
     const crystalGlow = isWhite ? "#003f25" : "#4a0615";
     const bodyMetal = new THREE.MeshPhysicalMaterial({
       color: crystalColor,
-      metalness: 0.12,
-      roughness: 0.075,
-      transmission: 0.22,
-      thickness: 1.25,
-      ior: 1.9,
+      metalness: 0.025,
+      roughness: 0.035,
+      transmission: 0.38,
+      thickness: 1.6,
+      ior: 2.05,
       clearcoat: 1,
-      clearcoatRoughness: 0.035,
+      clearcoatRoughness: 0.018,
       emissive: crystalGlow,
-      emissiveIntensity: 0.12,
-      envMapIntensity: 0
+      emissiveIntensity: 0.075,
+      envMapIntensity: 1.35,
+      flatShading: true
     });
     const brightGold = new THREE.MeshStandardMaterial({ color: "#f2ca70", metalness: 1, roughness: 0.09 });
     const whiteGold = new THREE.MeshStandardMaterial({ color: "#fff5d9", metalness: 1, roughness: 0.055 });
     const shadowMetal = new THREE.MeshStandardMaterial({ color: "#6f2436", metalness: 0.88, roughness: 0.16 });
     const sapphire = new THREE.MeshPhysicalMaterial({
       color: isWhite ? "#20f0a0" : "#ff3159",
-      metalness: 0.03, roughness: 0.055,
-      transmission: 0.28, thickness: 1.4, ior: 2.0,
-      clearcoat: 1, clearcoatRoughness: 0.025,
-      emissive: crystalGlow, emissiveIntensity: 0.08,
-      envMapIntensity: 0
+      metalness: 0.015, roughness: 0.025,
+      transmission: 0.48, thickness: 1.5, ior: 2.08,
+      clearcoat: 1, clearcoatRoughness: 0.015,
+      emissive: crystalGlow, emissiveIntensity: 0.045,
+      envMapIntensity: 1.45
     });
     const diamond = new THREE.MeshPhysicalMaterial({
-      color: "#fffdf5", metalness: 0.0, roughness: 0.035,
-      transmission: 0.42, thickness: 0.7, ior: 2.2,
-      clearcoat: 1, clearcoatRoughness: 0.025,
-      envMapIntensity: 0
+      color: "#fffdf5", metalness: 0.0, roughness: 0.018,
+      transmission: 0.62, thickness: 0.9, ior: 2.2,
+      clearcoat: 1, clearcoatRoughness: 0.012,
+      envMapIntensity: 1.6
     });
     const pearl = new THREE.MeshPhysicalMaterial({
       color: isWhite ? "#b9ffe0" : "#ffc0cd",
@@ -319,7 +326,9 @@ export function createChessScene3D(host, onSquareClick) {
       iridescenceThicknessRange: [320, 780],
       envMapIntensity: 0
     });
-    const trim = isWhite ? whiteGold : shadowMetal;
+    // UNITY AS ONE: both armies share the same champagne-gold and diamond regalia;
+    // only the crystal body and inset accent gems change from emerald to ruby.
+    const trim = brightGold;
 
     const addMesh = (geometry, material, x=0, y=0, z=0) => {
       const mesh = new THREE.Mesh(geometry, material);
@@ -337,7 +346,7 @@ export function createChessScene3D(host, onSquareClick) {
       return ring;
     };
     const addPearl = (radius, y, material=pearl) =>
-      addMesh(new THREE.SphereGeometry(radius, 32, 24), material, 0, y, 0);
+      addMesh(new THREE.IcosahedronGeometry(radius, 2), material, 0, y, 0);
     const addPave = (radius, y, count=16, gemMaterial=diamond, size=0.026) => {
       const geometry = new THREE.OctahedronGeometry(size,0);
       const stones = new THREE.InstancedMesh(geometry,gemMaterial,count);
@@ -378,7 +387,10 @@ export function createChessScene3D(host, onSquareClick) {
       k: [[0,.02],[.32,.02],[.35,.08],[.29,.14],[.21,.20],[.18,.37],[.23,.46],[.17,.55],[.12,.66],[.06,.72],[0,.72]]
     };
     const profile = profiles[piece.type].map(([r,h])=>new THREE.Vector2(r,h));
-    const turned = addMesh(new THREE.LatheGeometry(profile,64),bodyMetal);
+    // 16-sided turned crystal gives the body crisp diamond-like planes instead of
+    // the smooth plastic cylinder seen in the previous in-game build.
+    const turned = addMesh(new THREE.LatheGeometry(profile,16),bodyMetal);
+    turned.geometry.computeVertexNormals();
     turned.castShadow = true;
 
     // Weighted, stepped foot with a fine gold signature line and pavé edge.
@@ -444,10 +456,13 @@ export function createChessScene3D(host, onSquareClick) {
       shape.lineTo(-.16,.28); shape.lineTo(-.05,.24); shape.lineTo(.04,.34);
       shape.lineTo(.14,.29); shape.lineTo(.10,.18); shape.lineTo(.20,.09);
       shape.lineTo(.15,-.04); shape.lineTo(.06,-.13); shape.closePath();
-      const horse=addMesh(new THREE.ExtrudeGeometry(shape,{depth:.10,bevelEnabled:true,bevelSegments:3,steps:1,bevelSize:.025,bevelThickness:.025}),bodyMetal,0,.70,-.05);
+      const horse=addMesh(new THREE.ExtrudeGeometry(shape,{depth:.13,bevelEnabled:true,bevelSegments:4,steps:1,bevelSize:.035,bevelThickness:.035,curveSegments:8}),bodyMetal,0,.70,-.065);
       horse.rotation.y=Math.PI;
-      addMesh(new THREE.SphereGeometry(.025,16,12),diamond,.045,.91,.015);
+      addMesh(new THREE.OctahedronGeometry(.035,0),diamond,.045,.91,.015);
       addMesh(new THREE.ConeGeometry(.055,.14,8),brightGold,-.09,1.01,-.03);
+      // Diamond-set mane follows the horse neck, making the knight silhouette
+      // read as a jewelled chess horse rather than a flat token.
+      for (let i=0;i<4;i++) addMesh(new THREE.OctahedronGeometry(.026,0),diamond,-.12+i*.055,.91-i*.075,-.005);
       addRing(.16,.018,.53,brightGold);
       addPave(.16,.53,14,diamond,.02);
     } else if (piece.type === "p") {
