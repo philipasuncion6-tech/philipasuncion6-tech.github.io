@@ -6,7 +6,7 @@ export function createChessScene3D(host, onSquareClick) {
   host.classList.add("three-board-host");
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color("#090a0d");
+  scene.background = new THREE.Color("#030b08");
   // Keep the studio surroundings crisp: no distance fog or smoky haze.
 
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
@@ -84,10 +84,10 @@ export function createChessScene3D(host, onSquareClick) {
       gradient.addColorStop(.82, "#c8c1b8");
       gradient.addColorStop(1, "#a9a6a2");
     } else {
-      gradient.addColorStop(0, "#30394a");
-      gradient.addColorStop(.22, "#151c2b");
-      gradient.addColorStop(.58, "#080d17");
-      gradient.addColorStop(1, "#010308");
+      gradient.addColorStop(0, "#173c2b");
+      gradient.addColorStop(.22, "#0b2118");
+      gradient.addColorStop(.58, "#050f0b");
+      gradient.addColorStop(1, "#010503");
     }
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 1024, 1024);
@@ -110,7 +110,7 @@ export function createChessScene3D(host, onSquareClick) {
         ctx.lineTo(x + 15, y + 5);
         ctx.lineTo(x + 76, y + 2);
         ctx.lineTo(x + 175, y + 84);
-        const colors = ["rgba(117,157,202,.28)","rgba(168,180,205,.17)","rgba(80,113,161,.30)","rgba(255,255,255,.09)"];
+        const colors = ["rgba(70,190,130,.30)","rgba(150,220,180,.18)","rgba(35,130,85,.32)","rgba(255,255,255,.09)"];
         ctx.strokeStyle = colors[i % colors.length];
         ctx.lineWidth = 1.2 + (i % 3) * .7;
       }
@@ -138,7 +138,7 @@ export function createChessScene3D(host, onSquareClick) {
       seed = (seed * 16807) % 2147483647;
       const y = seed % 1024;
       const alpha = .025 + (seed % 30) / 1000;
-      ctx.fillStyle = pearlMode ? `rgba(255,255,255,${alpha})` : `rgba(170,190,220,${alpha})`;
+      ctx.fillStyle = pearlMode ? `rgba(255,255,255,${alpha})` : `rgba(125,205,160,${alpha})`;
       ctx.fillRect(x, y, 1 + (seed % 2), 1 + (seed % 2));
     }
 
@@ -158,12 +158,12 @@ export function createChessScene3D(host, onSquareClick) {
     specularIntensity: 0.8, envMapIntensity: 0
   });
   const darkSquare = new THREE.MeshPhysicalMaterial({
-    color: "#101522", map: obsidianMap, roughness: 0.28, metalness: 0.1,
-    emissive: "#07101e", emissiveIntensity: 0.035,
+    color: "#07150e", map: obsidianMap, roughness: 0.25, metalness: 0.12,
+    emissive: "#062415", emissiveIntensity: 0.055,
     clearcoat: 0.62, clearcoatRoughness: 0.18, envMapIntensity: 0
   });
-  const highlight = new THREE.MeshStandardMaterial({ color: "#e8fbff", roughness: 0.12, metalness: 0.2, emissive: "#4ebfff", emissiveIntensity: 0.42 });
-  const lastHighlight = new THREE.MeshStandardMaterial({ color: "#91e7ff", roughness: 0.42, metalness: 0.24, emissive: "#286caa", emissiveIntensity: 0.34 });
+  const highlight = new THREE.MeshStandardMaterial({ color: "#a8ffd2", roughness: 0.1, metalness: 0.18, emissive: "#16c878", emissiveIntensity: 0.48 });
+  const lastHighlight = new THREE.MeshStandardMaterial({ color: "#ff9cac", roughness: 0.34, metalness: 0.2, emissive: "#a91535", emissiveIntensity: 0.38 });
   const targetMat = new THREE.MeshBasicMaterial({ color: "#60d58b", transparent: true, opacity: 0.62, depthWrite: false });
   const checkedSquare = new THREE.MeshStandardMaterial({ color: "#b43a32", emissive: "#8f160d", emissiveIntensity: .55 });
 
@@ -226,7 +226,7 @@ export function createChessScene3D(host, onSquareClick) {
 
   // Ceylon-blue sapphire cabochons are bezel-set into all four frame corners.
   const cornerSapphire = new THREE.MeshPhysicalMaterial({
-    color: "#1452b4", metalness: .08, roughness: .4, transmission: .24,
+    color: "#00b96b", metalness: .08, roughness: .12, transmission: .32,
     thickness: 1.1, ior: 1.76, clearcoat: 0.62, clearcoatRoughness: .025,
     envMapIntensity: 0
   });
