@@ -78,6 +78,15 @@ try {
   boardElement.classList.remove("three-board-host");
   boardElement.classList.add("fallback-luxury-board");
   boardElement.style.cssText = "display:grid;position:relative;inset:auto;width:100%;height:auto;aspect-ratio:1;grid-template-columns:repeat(8,minmax(0,1fr));overflow:hidden;";
+  const fallbackNotice = document.createElement("div");
+  fallbackNotice.textContent = "3D MODE OFF • " + (error?.message || "WebGL initialization failed");
+  Object.assign(fallbackNotice.style, {
+    position: "absolute", left: "6px", right: "6px", bottom: "6px",
+    zIndex: "20", padding: "6px 8px", borderRadius: "6px",
+    background: "rgba(35,12,12,.94)", color: "#ffe0d5",
+    border: "1px solid rgba(255,150,120,.55)", font: "600 10px/1.35 sans-serif",
+    textAlign: "center", pointerEvents: "none", overflowWrap: "anywhere"
+  });
   scene3d = {
     render(position, selected, targets, previousMove, checkedKing, isFlipped) {
       const rows = position.board();
@@ -106,6 +115,7 @@ try {
           boardElement.appendChild(cell);
         }
       }
+      boardElement.appendChild(fallbackNotice);
     }
   };
 }
