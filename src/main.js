@@ -60,6 +60,29 @@ let audioContext = null;
 // Keep expensive AI search off the Android UI thread.
 let aiWorker = null;
 let aiWorkerFailed = false;
+let aiWorkerWatchdog = null;
+const AI_WORKER_TIMEOUT_MS = 6000;
+
+function clearAiWorkerWatchdog() {
+  if (aiWorkerWatchdog !== null) {
+    clearTimeout(aiWorkerWatchdog);
+    aiWorkerWatchdog = null;
+  }
+}
+
+function startAiWorkerWatchdog(token) {
+  clearAiWorkerWatchdog();
+  aiWorkerWatchdog = setTimeout(() => {
+    if (token !== computerMoveToken || !thinking) return;
+    console.warn("Chess AI worker timed out; switching to the mobile-safe backup AI.");
+    aiWorkerFailed = true;
+    if (aiWorker) {
+      try { aiWorker.terminate(); } catch (error) { console.warn("Could not terminate stalled AI worker.", error); }
+      aiWorker = null;
+    }
+    runCompatibilityFallback(token, true);
+  }, AI_WORKER_TIMEOUT_MS);
+}
 try {
   aiWorker = new Worker(new URL("./chess-ai.worker.js", import.meta.url), { type: "module" });
 } catch (error) {
@@ -498,7 +521,7 @@ function minimax(
 // Player is BLACK.
 // ======================================
 
-function chooseComputerMove() {
+function chooseComputerMove(searchDepth = AI_SEARCH_DEPTH) {
   const moves = orderedMoves(game);
 
   if (!moves.length) return null;
@@ -514,7 +537,7 @@ function chooseComputerMove() {
     try {
       score = minimax(
         game,
-        AI_SEARCH_DEPTH - 1,
+        searchDepth - 1,
         -Infinity,
         Infinity,
         false,
@@ -551,7 +574,8 @@ function runCompatibilityFallback(token, notify = false) {
 
   let errorMessage = "";
   try {
-    const move = chooseComputerMove();
+    // Keep the synchronous fallback responsive on lower-powered Android devices.
+    const move = chooseComputerMove(Math.min(AI_SEARCH_DEPTH, 2));
     if (!move) throw new Error("No legal computer move found.");
     const played = game.move({
       from: move.from,
@@ -579,6 +603,7 @@ if (aiWorker) {
   aiWorker.onmessage = (event) => {
     const { token, move, error } = event.data || {};
     if (token !== computerMoveToken) return;
+    clearAiWorkerWatchdog();
 
     if (error || (!move && !game.game_over())) {
       aiWorkerFailed = true;
@@ -611,7 +636,12 @@ if (aiWorker) {
 
   aiWorker.onerror = (event) => {
     console.error("Chess AI worker failed; switching to backup AI.", event);
+    clearAiWorkerWatchdog();
     aiWorkerFailed = true;
+    if (aiWorker) {
+      try { aiWorker.terminate(); } catch (error) { console.warn("Could not terminate failed AI worker.", error); }
+      aiWorker = null;
+    }
     runCompatibilityFallback(computerMoveToken, true);
   };
 }
@@ -642,10 +672,14 @@ function startComputerMove() {
     if (aiWorker && !aiWorkerFailed) {
       try {
         aiWorker.postMessage({ fen: game.fen(), depth: AI_SEARCH_DEPTH, token });
+        startAiWorkerWatchdog(token);
         return;
       } catch (error) {
         console.warn("Could not send position to chess AI worker; switching to backup AI.", error);
+        clearAiWorkerWatchdog();
         aiWorkerFailed = true;
+        try { aiWorker?.terminate(); } catch (terminateError) { console.warn("Could not terminate AI worker.", terminateError); }
+        aiWorker = null;
       }
     }
 
