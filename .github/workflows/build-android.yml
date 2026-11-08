@@ -63,6 +63,17 @@ jobs:
       - name: Sync Android project
         run: npx cap sync android
 
+      - name: Configure Gradle wrapper download timeout
+        working-directory: android
+        run: |
+          # Gradle's wrapper defaults to a 10-second download timeout. CI runners
+          # can take longer to follow the Gradle distribution redirect.
+          if grep -q '^networkTimeout=' gradle/wrapper/gradle-wrapper.properties; then
+            sed -i 's/^networkTimeout=.*/networkTimeout=120000/' gradle/wrapper/gradle-wrapper.properties
+          else
+            printf '\nnetworkTimeout=120000\n' >> gradle/wrapper/gradle-wrapper.properties
+          fi
+
       - name: Apply Pearl Royale Android launcher icon
         run: |
           sudo apt-get update
