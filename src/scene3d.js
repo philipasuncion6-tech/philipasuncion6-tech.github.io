@@ -14,14 +14,14 @@ export function createChessScene3D(host, onSquareClick) {
   camera.position.set(0, 10.5, 12.8);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
   renderer.domElement.style.touchAction = "none";
   renderer.domElement.setAttribute("aria-label", "Interactive 3D chessboard. Tap a square to select a piece or destination.");
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.12;
+  renderer.toneMappingExposure = 1.02;
   renderer.transmissionResolutionScale = 1;
   host.appendChild(renderer.domElement);
 
@@ -41,8 +41,8 @@ export function createChessScene3D(host, onSquareClick) {
   controls.maxPolarAngle = Math.PI * 0.48;
   controls.target.set(0, 0.25, 0);
 
-  scene.add(new THREE.HemisphereLight(0xfff4e7, 0x17191f, 1.05));
-  const keyLight = new THREE.DirectionalLight(0xffedcf, 2.35);
+  scene.add(new THREE.HemisphereLight(0xfff4e7, 0x17191f, 1.2));
+  const keyLight = new THREE.DirectionalLight(0xffedcf, 2.0);
   keyLight.position.set(-5, 10, 7);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(512, 512);
@@ -54,10 +54,10 @@ export function createChessScene3D(host, onSquareClick) {
   keyLight.shadow.camera.top = 7;
   keyLight.shadow.camera.bottom = -7;
   scene.add(keyLight);
-  const fillLight = new THREE.DirectionalLight(0xc7d5e8, 0.72);
+  const fillLight = new THREE.DirectionalLight(0xc7d5e8, 0.95);
   fillLight.position.set(6, 7, 4);
   scene.add(fillLight);
-  const rimLight = new THREE.PointLight(0xdce8f5, 18, 22);
+  const rimLight = new THREE.PointLight(0xdce8f5, 14, 22);
   rimLight.position.set(5, 5, -5);
   scene.add(rimLight);
   const warmLight = new THREE.PointLight(0xd9b879, 12, 20);
@@ -287,36 +287,40 @@ export function createChessScene3D(host, onSquareClick) {
     // High-clearcoat jewel surfaces keep the silhouettes vivid on Android WebView.
     const crystalColor = isWhite ? "#00c878" : "#e20b38";
     const crystalGlow = isWhite ? "#003f25" : "#4a0615";
+    // Opaque, optically clear jewel finish: transmission is deliberately disabled
+    // because mobile WebGL transmission can create a milky/plastic haze.
+    // Faceted normals and restrained clearcoat create readable gemstone planes.
     const bodyMetal = new THREE.MeshPhysicalMaterial({
-      color: crystalColor,
-      metalness: 0.025,
-      roughness: 0.035,
-      transmission: 0.38,
-      thickness: 1.6,
-      ior: 2.05,
-      clearcoat: 1,
-      clearcoatRoughness: 0.018,
+      color: isWhite ? "#00a968" : "#bd1238",
+      metalness: 0.08,
+      roughness: 0.19,
+      ior: 1.72,
+      clearcoat: 0.52,
+      clearcoatRoughness: 0.12,
+      iridescence: 0.22,
+      iridescenceIOR: 1.42,
+      iridescenceThicknessRange: [280, 620],
       emissive: crystalGlow,
-      emissiveIntensity: 0.075,
-      envMapIntensity: 1.35,
+      emissiveIntensity: 0.035,
+      envMapIntensity: 1.05,
       flatShading: true
     });
     const brightGold = new THREE.MeshStandardMaterial({ color: "#f2ca70", metalness: 1, roughness: 0.09 });
     const whiteGold = new THREE.MeshStandardMaterial({ color: "#fff5d9", metalness: 1, roughness: 0.055 });
     const shadowMetal = new THREE.MeshStandardMaterial({ color: "#6f2436", metalness: 0.88, roughness: 0.16 });
     const sapphire = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#20f0a0" : "#ff3159",
-      metalness: 0.015, roughness: 0.025,
-      transmission: 0.48, thickness: 1.5, ior: 2.08,
-      clearcoat: 1, clearcoatRoughness: 0.015,
-      emissive: crystalGlow, emissiveIntensity: 0.045,
-      envMapIntensity: 1.45
+      color: isWhite ? "#28e99b" : "#f02d58",
+      metalness: 0.06, roughness: 0.11,
+      ior: 1.72, clearcoat: 0.62, clearcoatRoughness: 0.09,
+      iridescence: 0.28, iridescenceIOR: 1.45,
+      iridescenceThicknessRange: [300, 680],
+      emissive: crystalGlow, emissiveIntensity: 0.025,
+      envMapIntensity: 1.1
     });
     const diamond = new THREE.MeshPhysicalMaterial({
-      color: "#fffdf5", metalness: 0.0, roughness: 0.018,
-      transmission: 0.62, thickness: 0.9, ior: 2.2,
-      clearcoat: 1, clearcoatRoughness: 0.012,
-      envMapIntensity: 1.6
+      color: "#fffdf5", metalness: 0.04, roughness: 0.085,
+      ior: 1.8, clearcoat: 0.72, clearcoatRoughness: 0.08,
+      envMapIntensity: 1.25
     });
     const pearl = new THREE.MeshPhysicalMaterial({
       color: isWhite ? "#b9ffe0" : "#ffc0cd",
@@ -378,18 +382,20 @@ export function createChessScene3D(host, onSquareClick) {
     };
 
     // Sculpted Staunton-inspired turned body, now rendered as precious metal.
+    // Six deliberately different royal silhouettes. The shared design language is
+    // faceted crystal, stepped gold bases and matching gem settings—not classic
+    // turned Staunton profiles.
     const profiles = {
-      p: [[0,.02],[.27,.02],[.31,.07],[.29,.12],[.22,.17],[.17,.24],[.15,.36],[.19,.43],[.16,.49],[.11,.55],[0,.57]],
-      r: [[0,.02],[.30,.02],[.33,.08],[.29,.14],[.22,.19],[.19,.31],[.23,.39],[.24,.48],[.28,.53],[.28,.62],[.20,.62],[.20,.57],[.13,.57],[.13,.62],[.06,.62],[.06,.57],[0,.57]],
-      n: [[0,.02],[.30,.02],[.32,.08],[.27,.14],[.20,.20],[.17,.31],[.22,.39],[.18,.48],[.12,.56],[.05,.62],[0,.62]],
-      b: [[0,.02],[.30,.02],[.33,.08],[.28,.14],[.20,.20],[.16,.34],[.20,.43],[.13,.52],[.10,.63],[.05,.70],[0,.72]],
-      q: [[0,.02],[.31,.02],[.34,.08],[.29,.14],[.21,.20],[.18,.35],[.22,.44],[.17,.53],[.12,.63],[.07,.68],[0,.68]],
-      k: [[0,.02],[.32,.02],[.35,.08],[.29,.14],[.21,.20],[.18,.37],[.23,.46],[.17,.55],[.12,.66],[.06,.72],[0,.72]]
+      p: [[0,.02],[.27,.02],[.31,.08],[.29,.13],[.20,.18],[.13,.28],[.12,.43],[.17,.51],[.13,.57],[.08,.60],[0,.60]],
+      r: [[0,.02],[.30,.02],[.34,.08],[.31,.15],[.24,.20],[.23,.48],[.29,.53],[.29,.63],[.23,.63],[.23,.57],[.15,.57],[.15,.63],[.07,.63],[.07,.57],[0,.57]],
+      n: [[0,.02],[.30,.02],[.34,.08],[.28,.15],[.19,.22],[.15,.34],[.20,.43],[.16,.52],[.10,.60],[.04,.66],[0,.66]],
+      b: [[0,.02],[.30,.02],[.34,.08],[.27,.15],[.18,.24],[.13,.39],[.16,.52],[.11,.62],[.07,.71],[.04,.76],[0,.76]],
+      q: [[0,.02],[.31,.02],[.35,.08],[.29,.15],[.20,.23],[.17,.40],[.23,.49],[.20,.58],[.15,.67],[.20,.73],[.13,.79],[0,.79]],
+      k: [[0,.02],[.32,.02],[.36,.08],[.30,.15],[.21,.23],[.17,.42],[.23,.51],[.19,.61],[.14,.71],[.19,.77],[.13,.83],[0,.83]]
     };
     const profile = profiles[piece.type].map(([r,h])=>new THREE.Vector2(r,h));
-    // 16-sided turned crystal gives the body crisp diamond-like planes instead of
-    // the smooth plastic cylinder seen in the previous in-game build.
-    const turned = addMesh(new THREE.LatheGeometry(profile,16),bodyMetal);
+    // Ten-sided crystal body creates broad, legible facet planes at phone size.
+    const turned = addMesh(new THREE.LatheGeometry(profile,10),bodyMetal);
     turned.geometry.computeVertexNormals();
     turned.castShadow = true;
 
