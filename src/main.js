@@ -59,9 +59,11 @@ let audioContext = null;
 
 // Keep expensive AI search off the Android UI thread.
 let aiWorker = null;
+let aiWorkerFailed = false;
 try {
   aiWorker = new Worker(new URL("./chess-ai.worker.js", import.meta.url), { type: "module" });
 } catch (error) {
+  aiWorkerFailed = true;
   console.warn("Chess AI worker is unavailable; using the compatibility fallback.", error);
 }
 
@@ -536,15 +538,57 @@ function chooseComputerMove() {
   ] || moves[0];
 }
 
+// If the module worker fails, keep the game playable with the built-in AI.
+function runCompatibilityFallback(token, notify = false) {
+  // A delayed worker error must never make a move for a newer game or the wrong side.
+  if (token !== computerMoveToken || game.game_over() || game.turn() !== "w") {
+    if (token === computerMoveToken) {
+      thinking = false;
+      render();
+    }
+    return;
+  }
+
+  let errorMessage = "";
+  try {
+    const move = chooseComputerMove();
+    if (!move) throw new Error("No legal computer move found.");
+    const played = game.move({
+      from: move.from,
+      to: move.to,
+      promotion: move.promotion || "q"
+    });
+    if (!played) throw new Error("Computer backup move was rejected.");
+    playSound(played.captured ? "capture" : game.in_check() ? "check" : "move");
+  } catch (error) {
+    console.error("Computer backup AI error:", error);
+    errorMessage = error.message || "Backup AI calculation failed.";
+  } finally {
+    if (token === computerMoveToken) {
+      thinking = false;
+      clearSelection();
+      render();
+      if (errorMessage) showToast("Computer error: " + errorMessage);
+      else if (notify) showToast("Computer switched to backup AI mode.");
+    }
+  }
+}
+
 // Receive the AI result without blocking board animation or touch input.
 if (aiWorker) {
   aiWorker.onmessage = (event) => {
     const { token, move, error } = event.data || {};
     if (token !== computerMoveToken) return;
 
-    let errorMessage = error || "";
+    if (error || (!move && !game.game_over())) {
+      aiWorkerFailed = true;
+      console.warn("Chess AI worker returned no usable move; switching to backup AI.", error);
+      runCompatibilityFallback(token, true);
+      return;
+    }
+
     try {
-      if (!errorMessage && move && !game.game_over() && game.turn() === "w") {
+      if (move && !game.game_over() && game.turn() === "w") {
         const played = game.move({
           from: move.from,
           to: move.to,
@@ -552,25 +596,23 @@ if (aiWorker) {
         });
         if (!played) throw new Error("Computer move was rejected.");
         playSound(played.captured ? "capture" : game.in_check() ? "check" : "move");
-      } else if (!errorMessage && !move && !game.game_over()) {
-        throw new Error("No legal computer move found.");
       }
     } catch (caught) {
-      console.error("Computer AI error:", caught);
-      errorMessage = caught.message || "Computer AI error.";
-    } finally {
-      thinking = false;
-      clearSelection();
-      render();
-      if (errorMessage) showToast("Computer error: " + errorMessage);
+      aiWorkerFailed = true;
+      console.error("Computer AI result could not be applied; switching to backup AI.", caught);
+      runCompatibilityFallback(token, true);
+      return;
     }
+
+    thinking = false;
+    clearSelection();
+    render();
   };
 
   aiWorker.onerror = (event) => {
-    console.error("Chess AI worker failed:", event);
-    thinking = false;
-    render();
-    showToast("Computer AI worker failed. Please start a new game.");
+    console.error("Chess AI worker failed; switching to backup AI.", event);
+    aiWorkerFailed = true;
+    runCompatibilityFallback(computerMoveToken, true);
   };
 }
 
@@ -597,30 +639,18 @@ function startComputerMove() {
     // Ignore an old delayed move after New Game or Undo.
     if (token !== computerMoveToken) return;
 
-    if (aiWorker) {
-      aiWorker.postMessage({ fen: game.fen(), depth: AI_SEARCH_DEPTH, token });
-      return;
-    }
-
-    // Compatibility fallback for browsers that do not support module workers.
-    let errorMessage = "";
-    try {
-      const move = chooseComputerMove();
-      if (!move) throw new Error("No legal computer move found.");
-      const played = game.move({ from: move.from, to: move.to, promotion: move.promotion || "q" });
-      if (!played) throw new Error("Computer move was rejected.");
-      playSound(played.captured ? "capture" : game.in_check() ? "check" : "move");
-    } catch (error) {
-      console.error("Computer AI error:", error);
-      errorMessage = "Computer error: " + error.message;
-    } finally {
-      if (token === computerMoveToken) {
-        thinking = false;
-        clearSelection();
-        render();
-        if (errorMessage) showToast(errorMessage);
+    if (aiWorker && !aiWorkerFailed) {
+      try {
+        aiWorker.postMessage({ fen: game.fen(), depth: AI_SEARCH_DEPTH, token });
+        return;
+      } catch (error) {
+        console.warn("Could not send position to chess AI worker; switching to backup AI.", error);
+        aiWorkerFailed = true;
       }
     }
+
+    // Compatibility fallback for unsupported or failed module workers.
+    runCompatibilityFallback(token, aiWorkerFailed);
   }, 250);
 }
 
