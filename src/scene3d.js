@@ -231,12 +231,17 @@ export function createChessScene3D(host, onSquareClick) {
   }
 
   // Ceylon-blue sapphire cabochons are bezel-set into all four frame corners.
+  // Opaque decorative stones avoid costly transmission rendering and milky highlights on mobile.
   const cornerSapphire = new THREE.MeshPhysicalMaterial({
-    color: "#00b96b", metalness: .08, roughness: .12, transmission: .32,
-    thickness: 1.1, ior: 1.76, clearcoat: 0.62, clearcoatRoughness: .025,
-    envMapIntensity: 0
+    color: "#00b96b", metalness: .12, roughness: .2,
+    ior: 1.76, clearcoat: 0.58, clearcoatRoughness: .08,
+    envMapIntensity: 0, flatShading: true
   });
-  const cornerDiamond = new THREE.MeshPhysicalMaterial({ color: "#ffffff", roughness: .025, metalness: .02, transmission: .2, ior: 2.2, clearcoat: 0.62 });
+  const cornerDiamond = new THREE.MeshPhysicalMaterial({
+    color: "#ffffff", roughness: .12, metalness: .04,
+    ior: 1.8, clearcoat: 0.62, clearcoatRoughness: .08,
+    flatShading: true
+  });
   for (const x of [-4.02, 4.02]) for (const z of [-4.02, 4.02]) {
     const mount = new THREE.Mesh(new THREE.CylinderGeometry(.18,.21,.075,48), frameMetal);
     mount.position.set(x,.22,z);
@@ -557,6 +562,7 @@ export function createChessScene3D(host, onSquareClick) {
   }, { passive: true });
 
   let currentFlipped = null;
+  let currentPositionKey = null;
   function disposeGroup(group) {
     group.traverse(obj => {
       if (!obj.isMesh) return;
@@ -568,24 +574,30 @@ export function createChessScene3D(host, onSquareClick) {
   }
 
   function render(game, selectedSquare, legalTargets, lastMove, checkedKing, flipped) {
-    disposeGroup(piecesGroup);
+    // A camera flip or selection change does not alter the chess position.
+    // Keep the expensive 3D pieces alive until the actual position changes.
     disposeGroup(targetsGroup);
-    pieceMeshes.length = 0;
     for (const [name, tile] of squareMeshes) {
       tile.material = (Number(name[1]) + "abcdefgh".indexOf(name[0])) % 2 === 0 ? lightSquare : darkSquare;
       if (lastMove && (lastMove.from === name || lastMove.to === name)) tile.material = lastHighlight;
       if (selectedSquare === name) tile.material = highlight;
       if (checkedKing === name) tile.material = checkedSquare;
     }
-    const board = game.board();
-    for (let row = 0; row < 8; row++) {
-      for (let col = 0; col < 8; col++) {
-        const piece = board[row][col];
-        if (piece) {
-          const square = "abcdefgh"[col] + (8 - row);
-          makePiece(piece, square);
+    const positionKey = game.fen();
+    if (currentPositionKey !== positionKey) {
+      disposeGroup(piecesGroup);
+      pieceMeshes.length = 0;
+      const board = game.board();
+      for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+          const piece = board[row][col];
+          if (piece) {
+            const square = "abcdefgh"[col] + (8 - row);
+            makePiece(piece, square);
+          }
         }
       }
+      currentPositionKey = positionKey;
     }
     for (const name of legalTargets) {
       const [file,rank] = ["abcdefgh".indexOf(name[0]),Number(name[1])];
