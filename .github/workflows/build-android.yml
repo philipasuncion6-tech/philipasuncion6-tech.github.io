@@ -2,6 +2,19 @@ name: Build ASUNCION CHESS APK
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "public/**"
+      - "index.html"
+      - "main.js"
+      - "style.css"
+      - "package.json"
+      - "vite.config.js"
+      - "capacitor.config.json"
+      - ".github/workflows/build-android.yml"
   push:
     branches:
       - main
@@ -57,6 +70,9 @@ jobs:
           RES="android/app/src/main/res"
           mkdir -p "$RES/drawable-nodpi" "$RES/mipmap-anydpi-v26" "$RES/values"
           convert -background none public/asuncion-chess-icon.svg -resize 432x432 "$RES/drawable-nodpi/ic_launcher_foreground.png"
+          # Capacitor also generates a default Android-robot vector with the same resource name.
+          # Remove that higher-priority vector so Android uses our custom Diamond Edition PNG.
+          rm -f "$RES/drawable-anydpi-v24/ic_launcher_foreground.xml" "$RES/drawable-anydpi-v24/\$ic_launcher_foreground__0.xml"
           for spec in "mdpi:48" "hdpi:72" "xhdpi:96" "xxhdpi:144" "xxxhdpi:192"; do
             density="${spec%%:*}"
             size="${spec##*:}"
