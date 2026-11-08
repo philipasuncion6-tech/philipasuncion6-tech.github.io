@@ -73,8 +73,7 @@ jobs:
           # Capacitor may contribute its default Android-robot foreground vector from
           # its library module, not only from app/src/main/res. Any-dpi vectors take
           # priority over our drawable-nodpi PNG, so remove every conflicting copy.
-          find android node_modules -type f -path '*/drawable-anydpi-v24/*' \\
-            \( -name 'ic_launcher_foreground.xml' -o -name '$ic_launcher_foreground__0.xml' \) -delete
+          find android node_modules -type f -path '*/drawable-anydpi-v24/*' \( -name 'ic_launcher_foreground.xml' -o -name '$ic_launcher_foreground__0.xml' \) -delete
           if find android node_modules -type f -path '*/drawable-anydpi-v24/*' \( -name 'ic_launcher_foreground.xml' -o -name '$ic_launcher_foreground__0.xml' \) | grep -q .; then
             echo "Default Android launcher foreground vector still exists"
             exit 1
