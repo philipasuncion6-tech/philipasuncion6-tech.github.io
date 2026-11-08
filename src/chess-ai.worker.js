@@ -174,7 +174,9 @@ self.onmessage = (event) => {
   const { fen, depth, token } = event.data || {};
   try {
     const position = new Chess();
-    if (!position.load(fen)) throw new Error("Invalid chess position.");
+    // chess.js 0.10.3 throws for an invalid FEN and returns undefined on success.
+    // Do not treat the successful load result as a boolean.
+    position.load(fen);
 
     const legalMoves = position.moves({ verbose: true });
     if (!legalMoves.length) {
