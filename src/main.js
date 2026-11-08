@@ -686,8 +686,8 @@ function updatePanels() {
     result = whiteToMove ? "Black wins" : "White wins";
 
     title = whiteToMove
-      ? "Computer wins!"
-      : "Checkmate! You win!";
+      ? "Checkmate! You win!"
+      : "Computer wins!";
 
     message = "The game has ended by checkmate.";
     icon = "♛";
