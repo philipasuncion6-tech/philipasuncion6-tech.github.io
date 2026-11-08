@@ -13,7 +13,7 @@
 <path d="M0 340 90 270l80 45 82-70 85 66 90-58 85 62v197H0z" fill="#b4e8a1"/>
 <path d="M0 390 110 326l85 50 70-55 105 61 78-49 64 34v145H0z" fill="#55b979" opacity=".7"/>
 <!-- Keep all essential icon artwork inside Android adaptive-icon safe zone -->
-<g transform="translate(102.4 102.4) scale(0.6)">
+<g transform="translate(46.08 46.08) scale(0.82)">
 
 <path d="M86 397 256 330l170 67-170 69z" fill="#74501e" opacity=".25" filter="url(#shadow)"/>
 <!-- sunlit checkerboard -->
