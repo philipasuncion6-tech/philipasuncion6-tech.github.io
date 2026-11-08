@@ -70,9 +70,18 @@ jobs:
           RES="android/app/src/main/res"
           mkdir -p "$RES/drawable-nodpi" "$RES/mipmap-anydpi-v26" "$RES/values"
           convert -background none public/asuncion-chess-icon.svg -resize 432x432 "$RES/drawable-nodpi/ic_launcher_foreground.png"
-          # Capacitor also generates a default Android-robot vector with the same resource name.
-          # Remove that higher-priority vector so Android uses our custom Diamond Edition PNG.
-          rm -f "$RES/drawable-anydpi-v24/ic_launcher_foreground.xml" "$RES/drawable-anydpi-v24/\$ic_launcher_foreground__0.xml"
+          # Capacitor may contribute its default Android-robot foreground vector from
+          # its library module, not only from app/src/main/res. Any-dpi vectors take
+          # priority over our drawable-nodpi PNG, so remove every conflicting copy.
+          find android node_modules -type f \\
+            \( -name "ic_launcher_foreground.xml" -o -name "\$ic_launcher_foreground__0.xml" \) \\
+            -path "*/drawable-anydpi-v24/*" -delete
+          if find android node_modules -type f \\
+            \( -name "ic_launcher_foreground.xml" -o -name "\$ic_launcher_foreground__0.xml" \) \\
+            -path "*/drawable-anydpi-v24/*" | grep -q .; then
+            echo "Default Android launcher foreground vector still exists"
+            exit 1
+          fi
           for spec in "mdpi:48" "hdpi:72" "xhdpi:96" "xxhdpi:144" "xxxhdpi:192"; do
             density="${spec%%:*}"
             size="${spec##*:}"
@@ -96,6 +105,18 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug
+
+      - name: Verify packaged launcher icon resources
+        working-directory: android
+        run: |
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+          if unzip -l "$APK" | grep -E 'res/drawable-anydpi-v24/(\\$ic_launcher_foreground__0|ic_launcher_foreground)\\.xml'; then
+            echo "APK still contains the default Android foreground vector"
+            exit 1
+          fi
+          unzip -l "$APK" | grep -q 'res/drawable-nodpi-v4/ic_launcher_foreground.png'
+          unzip -l "$APK" | grep -q 'res/mipmap-xxxhdpi-v4/ic_launcher.png'
+          echo "Custom ASUNCION CHESS launcher PNGs are packaged; default robot vectors are absent."
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
