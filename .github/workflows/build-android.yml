@@ -69,15 +69,13 @@ jobs:
           sudo apt-get install -y imagemagick
           RES="android/app/src/main/res"
           mkdir -p "$RES/drawable-nodpi" "$RES/mipmap-anydpi-v26" "$RES/values"
+          # Put the custom foreground in the SAME anydpi-v24 qualifier as the
+          # Capacitor library vector. App resources take precedence over dependency
+          # resources when Android merges identical resource names/configurations.
+          # This avoids relying on deleting files inside Gradle dependency caches.
+          mkdir -p "$RES/drawable-anydpi-v24"
+          convert -background none public/asuncion-chess-icon.svg -resize 432x432 "$RES/drawable-anydpi-v24/ic_launcher_foreground.png"
           convert -background none public/asuncion-chess-icon.svg -resize 432x432 "$RES/drawable-nodpi/ic_launcher_foreground.png"
-          # Capacitor may contribute its default Android-robot foreground vector from
-          # its library module, not only from app/src/main/res. Any-dpi vectors take
-          # priority over our drawable-nodpi PNG, so remove every conflicting copy.
-          find android node_modules -type f -path '*/drawable-anydpi-v24/*' \( -name 'ic_launcher_foreground.xml' -o -name '$ic_launcher_foreground__0.xml' \) -delete
-          if find android node_modules -type f -path '*/drawable-anydpi-v24/*' \( -name 'ic_launcher_foreground.xml' -o -name '$ic_launcher_foreground__0.xml' \) | grep -q .; then
-            echo "Default Android launcher foreground vector still exists"
-            exit 1
-          fi
           for spec in "mdpi:48" "hdpi:72" "xhdpi:96" "xxhdpi:144" "xxxhdpi:192"; do
             density="${spec%%:*}"
             size="${spec##*:}"
@@ -106,13 +104,14 @@ jobs:
         working-directory: android
         run: |
           APK="app/build/outputs/apk/debug/app-debug.apk"
-          if unzip -l "$APK" | grep -E 'res/drawable-anydpi-v24/(\\$ic_launcher_foreground__0|ic_launcher_foreground)\\.xml'; then
-            echo "APK still contains the default Android foreground vector"
-            exit 1
-          fi
-          unzip -l "$APK" | grep -q 'res/drawable-nodpi-v4/ic_launcher_foreground.png'
+          unzip -l "$APK" | grep -q 'res/drawable-anydpi-v24/ic_launcher_foreground.png'
+          unzip -l "$APK" | grep -q 'res/mipmap-anydpi-v26/ic_launcher.xml'
           unzip -l "$APK" | grep -q 'res/mipmap-xxxhdpi-v4/ic_launcher.png'
-          echo "Custom ASUNCION CHESS launcher PNGs are packaged; default robot vectors are absent."
+          # Confirm the adaptive icon points at the app-owned foreground resource.
+          unzip -p "$APK" resources.arsc > /tmp/resources.arsc
+          "$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)/aapt" dump resources "$APK" > /tmp/apk-resources.txt
+          grep -q 'drawable/ic_launcher_foreground' /tmp/apk-resources.txt
+          echo "Custom Pearl Royale anydpi foreground PNG and adaptive launcher icon are packaged."
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
