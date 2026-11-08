@@ -277,37 +277,46 @@ export function createChessScene3D(host, onSquareClick) {
     const group = new THREE.Group();
     const isWhite = piece.color === "w";
 
-    // Pearl Royale interpretation: rhodium-finished white gold, pavé diamonds,
-    // white/black South-Sea-style pearl heads and restrained Ceylon sapphire accents.
+    // Emerald crystal army (computer/White) versus ruby crystal army (player/Black).
+    // High-clearcoat jewel surfaces keep the silhouettes vivid on Android WebView.
+    const crystalColor = isWhite ? "#00c878" : "#e20b38";
+    const crystalGlow = isWhite ? "#003f25" : "#4a0615";
     const bodyMetal = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#fff8e9" : "#171923",
-      metalness: 0.82,
-      roughness: 0.22,
-      clearcoat: 0.62,
-      clearcoatRoughness: 0.18,
+      color: crystalColor,
+      metalness: 0.12,
+      roughness: 0.075,
+      transmission: 0.22,
+      thickness: 1.25,
+      ior: 1.9,
+      clearcoat: 1,
+      clearcoatRoughness: 0.035,
+      emissive: crystalGlow,
+      emissiveIntensity: 0.12,
       envMapIntensity: 0
     });
-    const brightGold = new THREE.MeshStandardMaterial({ color: "#e7bd70", metalness: 1, roughness: 0.11 });
-    const whiteGold = new THREE.MeshStandardMaterial({ color: "#fffdf5", metalness: 1, roughness: 0.075 });
-    const shadowMetal = new THREE.MeshStandardMaterial({ color: "#8b6d48", metalness: 1, roughness: 0.13 });
+    const brightGold = new THREE.MeshStandardMaterial({ color: "#f2ca70", metalness: 1, roughness: 0.09 });
+    const whiteGold = new THREE.MeshStandardMaterial({ color: "#fff5d9", metalness: 1, roughness: 0.055 });
+    const shadowMetal = new THREE.MeshStandardMaterial({ color: "#6f2436", metalness: 0.88, roughness: 0.16 });
     const sapphire = new THREE.MeshPhysicalMaterial({
-      color: "#164b9a", metalness: 0.04, roughness: 0.12,
-      transmission: 0.34, thickness: 1.2, ior: 1.76,
-      clearcoat: 0.62, clearcoatRoughness: 0.18,
+      color: isWhite ? "#20f0a0" : "#ff3159",
+      metalness: 0.03, roughness: 0.055,
+      transmission: 0.28, thickness: 1.4, ior: 2.0,
+      clearcoat: 1, clearcoatRoughness: 0.025,
+      emissive: crystalGlow, emissiveIntensity: 0.08,
       envMapIntensity: 0
     });
     const diamond = new THREE.MeshPhysicalMaterial({
-      color: "#ffffff", metalness: 0.0, roughness: 0.07,
-      transmission: 0.72, thickness: 0.7, ior: 2.35,
-      clearcoat: 0.62, clearcoatRoughness: 0.18,
+      color: "#fffdf5", metalness: 0.0, roughness: 0.035,
+      transmission: 0.42, thickness: 0.7, ior: 2.2,
+      clearcoat: 1, clearcoatRoughness: 0.025,
       envMapIntensity: 0
     });
     const pearl = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#fff7e8" : "#090b13",
-      metalness: 0.08, roughness: 0.14,
-      clearcoat: 0.62, clearcoatRoughness: 0.18,
-      iridescence: 0, iridescenceIOR: 1.48,
-      iridescenceThicknessRange: [260, 520],
+      color: isWhite ? "#b9ffe0" : "#ffc0cd",
+      metalness: 0.03, roughness: 0.065,
+      clearcoat: 1, clearcoatRoughness: 0.025,
+      iridescence: 0.35, iridescenceIOR: 1.48,
+      iridescenceThicknessRange: [320, 780],
       envMapIntensity: 0
     });
     const trim = isWhite ? whiteGold : shadowMetal;
