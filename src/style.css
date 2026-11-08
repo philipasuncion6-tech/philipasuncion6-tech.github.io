@@ -1228,3 +1228,29 @@ body {
 }
 .footer-note { color: #8da99a; }
 .footer-note span { color: #e8c879; }
+
+/* DIAMOND CUT UPDATE — keep the 3D viewport crisp; no radial haze behind the board. */
+.board-stage {
+  background: #070b10 !important;
+  background-image: none !important;
+  box-shadow: 0 14px 30px rgba(0,0,0,.72), inset 0 0 0 1px rgba(211,181,119,.16) !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+.board-stage::before,
+.board-stage::after,
+.board-stage .board-shadow {
+  display: none !important;
+  content: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+}
+#board.three-board-host,
+.three-board-host {
+  background: transparent !important;
+  filter: none !important;
+}
+.three-board-host canvas {
+  image-rendering: auto;
+  filter: none !important;
+}
