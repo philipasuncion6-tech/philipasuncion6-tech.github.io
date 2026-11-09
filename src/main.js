@@ -55,6 +55,8 @@ let pendingPromotion = null;
 let toastTimer = null;
 let computerMoveToken = 0;
 let soundEnabled = true;
+let watchMode = false;
+let watchTimer = null;
 let audioContext = null;
 
 // Keep expensive AI search off the Android UI thread.
@@ -217,7 +219,7 @@ function clearSelection() {
 }
 
 function handleSquareClick(name) {
-  if (thinking || game.game_over() || pendingPromotion) {
+  if (watchMode || thinking || game.game_over() || pendingPromotion) {
     return;
   }
 
@@ -521,12 +523,13 @@ function minimax(
 // Player is BLACK.
 // ======================================
 
-function chooseComputerMove(searchDepth = AI_SEARCH_DEPTH) {
+function chooseComputerMove(searchDepth = AI_SEARCH_DEPTH, side = game.turn()) {
   const moves = orderedMoves(game);
+  const isWhite = side === "w";
 
   if (!moves.length) return null;
 
-  let bestScore = -Infinity;
+  let bestScore = isWhite ? -Infinity : Infinity;
   let bestMoves = [];
 
   for (const move of moves) {
@@ -540,14 +543,14 @@ function chooseComputerMove(searchDepth = AI_SEARCH_DEPTH) {
         searchDepth - 1,
         -Infinity,
         Infinity,
-        false,
+        game.turn() === "w",
         1
       );
     } finally {
       game.undo();
     }
 
-    if (score > bestScore) {
+    if ((isWhite && score > bestScore) || (!isWhite && score < bestScore)) {
       bestScore = score;
       bestMoves = [move];
     } else if (score === bestScore) {
@@ -649,6 +652,43 @@ if (aiWorker) {
 // ======================================
 // COMPUTER TURN
 // ======================================
+
+function startWatchMove() {
+  if (!watchMode || game.game_over() || thinking) { render(); return; }
+  const token = ++computerMoveToken;
+  thinking = true;
+  render();
+  watchTimer = setTimeout(() => {
+    if (token !== computerMoveToken || !watchMode || game.game_over()) return;
+    try {
+      const move = chooseComputerMove(Math.min(AI_SEARCH_DEPTH, 2), game.turn());
+      if (!move) throw new Error("No legal move found.");
+      const played = game.move({ from: move.from, to: move.to, promotion: move.promotion || "q" });
+      if (!played) throw new Error("AI move was rejected.");
+      playSound(played.captured ? "capture" : game.in_check() ? "check" : "move");
+    } catch (error) {
+      console.error("Watch Mode AI error:", error);
+      watchMode = false;
+      showToast("Watch Mode stopped: " + (error.message || "AI error"));
+    }
+    if (token === computerMoveToken) {
+      thinking = false; clearSelection(); render();
+      if (watchMode && !game.game_over()) startWatchMove();
+      else if (game.game_over()) showToast("Watch Mode finished. " + $("game-result").textContent);
+    }
+  }, 550);
+}
+
+function toggleWatchMode() {
+  watchMode = !watchMode;
+  computerMoveToken++;
+  clearTimeout(watchTimer);
+  thinking = false;
+  const button = $("watch-toggle");
+  if (button) button.textContent = watchMode ? "Ⅱ Stop Watching" : "▶ Watch AI vs AI";
+  showToast(watchMode ? "Watch Mode started: AI vs AI." : "Watch Mode stopped.");
+  if (watchMode) startWatchMove(); else render();
+}
 
 function startComputerMove() {
   if (
@@ -784,14 +824,16 @@ function updatePanels() {
   statusText.textContent = message;
   statusIcon.textContent = icon;
 
-  computerTurn.textContent = thinking
-    ? "THINKING"
-    : whiteToMove && !over
-      ? "COMPUTER TURN"
-      : "COMPUTER";
-
-  playerTurn.textContent =
-    !whiteToMove && !over ? "YOUR TURN" : "WAIT";
+  computerTurn.textContent = watchMode
+    ? (thinking && whiteToMove ? "WHITE AI THINKING" : "WHITE AI")
+    : thinking ? "THINKING" : whiteToMove && !over ? "COMPUTER TURN" : "COMPUTER";
+  playerTurn.textContent = watchMode
+    ? (thinking && !whiteToMove ? "BLACK AI THINKING" : "BLACK AI")
+    : !whiteToMove && !over ? "YOUR TURN" : "WAIT";
+  const opponentName = document.querySelector(".opponent-row .player-meta strong");
+  const playerName = document.querySelector(".user-row .player-meta strong");
+  if (opponentName) opponentName.textContent = watchMode ? "WHITE AI" : "COMPUTER";
+  if (playerName) playerName.textContent = watchMode ? "BLACK AI" : "YOU";
 
   computerTurn.classList.toggle(
     "active",
@@ -818,6 +860,7 @@ function render() {
 
 function newGame() {
   computerMoveToken++;
+  clearTimeout(watchTimer);
 
   game.reset();
 
@@ -830,8 +873,8 @@ function newGame() {
 
   showToast("New game started!");
 
-  // Computer plays White first.
-  startComputerMove();
+  // White starts; Watch Mode controls both sides automatically.
+  if (watchMode) startWatchMove(); else startComputerMove();
 }
 
 // ======================================
@@ -883,6 +926,7 @@ function flipBoard() {
 $("new-game").addEventListener("click", newGame);
 
 $("undo").addEventListener("click", undoMove);
+$("watch-toggle")?.addEventListener("click", toggleWatchMode);
 
 $("flip").addEventListener("click", flipBoard);
 
