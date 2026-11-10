@@ -7,7 +7,7 @@ export function createChessScene3D(host, onSquareClick) {
   host.classList.add("three-board-host");
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color("#030b08");
+  scene.background = new THREE.Color("#111116");
   // Keep the studio surroundings crisp: no distance fog or smoky haze.
 
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
@@ -41,8 +41,8 @@ export function createChessScene3D(host, onSquareClick) {
   controls.maxPolarAngle = Math.PI * 0.48;
   controls.target.set(0, 0.25, 0);
 
-  scene.add(new THREE.HemisphereLight(0xfff4e7, 0x17191f, 1.2));
-  const keyLight = new THREE.DirectionalLight(0xffedcf, 2.0);
+  scene.add(new THREE.HemisphereLight(0xfff0d8, 0x17131b, 1.35));
+  const keyLight = new THREE.DirectionalLight(0xffdfad, 2.25);
   keyLight.position.set(-5, 10, 7);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(512, 512);
@@ -60,7 +60,7 @@ export function createChessScene3D(host, onSquareClick) {
   const rimLight = new THREE.PointLight(0xdce8f5, 14, 22);
   rimLight.position.set(5, 5, -5);
   scene.add(rimLight);
-  const warmLight = new THREE.PointLight(0xd9b879, 12, 20);
+  const warmLight = new THREE.PointLight(0xf2c878, 16, 22);
   warmLight.position.set(-5, 3, 5);
   scene.add(warmLight);
 
@@ -90,10 +90,10 @@ export function createChessScene3D(host, onSquareClick) {
       gradient.addColorStop(.82, "#c8c1b8");
       gradient.addColorStop(1, "#a9a6a2");
     } else {
-      gradient.addColorStop(0, "#173c2b");
-      gradient.addColorStop(.22, "#0b2118");
-      gradient.addColorStop(.58, "#050f0b");
-      gradient.addColorStop(1, "#010503");
+      gradient.addColorStop(0, "#39343a");
+      gradient.addColorStop(.22, "#211f25");
+      gradient.addColorStop(.58, "#101015");
+      gradient.addColorStop(1, "#07070b");
     }
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 1024, 1024);
@@ -116,7 +116,7 @@ export function createChessScene3D(host, onSquareClick) {
         ctx.lineTo(x + 15, y + 5);
         ctx.lineTo(x + 76, y + 2);
         ctx.lineTo(x + 175, y + 84);
-        const colors = ["rgba(70,190,130,.30)","rgba(150,220,180,.18)","rgba(35,130,85,.32)","rgba(255,255,255,.09)"];
+        const colors = ["rgba(220,190,135,.24)","rgba(190,190,205,.15)","rgba(255,255,255,.12)","rgba(125,105,85,.20)"];
         ctx.strokeStyle = colors[i % colors.length];
         ctx.lineWidth = 1.2 + (i % 3) * .7;
       }
@@ -144,7 +144,7 @@ export function createChessScene3D(host, onSquareClick) {
       seed = (seed * 16807) % 2147483647;
       const y = seed % 1024;
       const alpha = .025 + (seed % 30) / 1000;
-      ctx.fillStyle = pearlMode ? `rgba(255,255,255,${alpha})` : `rgba(125,205,160,${alpha})`;
+      ctx.fillStyle = pearlMode ? `rgba(255,255,255,${alpha})` : `rgba(205,195,180,${alpha})`;
       ctx.fillRect(x, y, 1 + (seed % 2), 1 + (seed % 2));
     }
 
@@ -156,20 +156,20 @@ export function createChessScene3D(host, onSquareClick) {
   }
   const pearlMap = makeSurfaceTexture("pearl");
   const obsidianMap = makeSurfaceTexture("obsidian");
-  const wood = new THREE.MeshPhysicalMaterial({ color: "#b58a4d", roughness: 0.42, metalness: 0.72, clearcoat: 0.62, clearcoatRoughness: 0.18 });
+  const wood = new THREE.MeshPhysicalMaterial({ color: "#a77b3d", roughness: 0.32, metalness: 0.72, clearcoat: 0.62, clearcoatRoughness: 0.18 });
   const lightSquare = new THREE.MeshPhysicalMaterial({
-    color: "#fff8e9", map: pearlMap, roughness: 0.24, metalness: 0.03,
+    color: "#fff2d9", map: pearlMap, roughness: 0.24, metalness: 0.03,
     clearcoat: 0.62, clearcoatRoughness: 0.18, iridescence: 0,
     iridescenceIOR: 1.42, iridescenceThicknessRange: [360, 820],
     specularIntensity: 0.8, envMapIntensity: 0
   });
   const darkSquare = new THREE.MeshPhysicalMaterial({
-    color: "#07150e", map: obsidianMap, roughness: 0.25, metalness: 0.12,
-    emissive: "#062415", emissiveIntensity: 0.055,
+    color: "#17151b", map: obsidianMap, roughness: 0.25, metalness: 0.12,
+    emissive: "#171018", emissiveIntensity: 0.055,
     clearcoat: 0.62, clearcoatRoughness: 0.18, envMapIntensity: 0
   });
-  const highlight = new THREE.MeshStandardMaterial({ color: "#a8ffd2", roughness: 0.1, metalness: 0.18, emissive: "#16c878", emissiveIntensity: 0.48 });
-  const lastHighlight = new THREE.MeshStandardMaterial({ color: "#ff9cac", roughness: 0.34, metalness: 0.2, emissive: "#a91535", emissiveIntensity: 0.38 });
+  const highlight = new THREE.MeshStandardMaterial({ color: "#e8c77f", roughness: 0.1, metalness: 0.18, emissive: "#b77a24", emissiveIntensity: 0.48 });
+  const lastHighlight = new THREE.MeshStandardMaterial({ color: "#d8b5a0", roughness: 0.34, metalness: 0.2, emissive: "#80522d", emissiveIntensity: 0.38 });
   const targetMat = new THREE.MeshBasicMaterial({ color: "#60d58b", transparent: true, opacity: 0.62, depthWrite: false });
   const checkedSquare = new THREE.MeshStandardMaterial({ color: "#b43a32", emissive: "#8f160d", emissiveIntensity: .55 });
 
@@ -198,7 +198,7 @@ export function createChessScene3D(host, onSquareClick) {
   // Layered white-gold / champagne-gold plinth with a visible polished bevel.
   const edge = new THREE.Mesh(
     new THREE.BoxGeometry(8.78, 0.16, 8.78),
-    new THREE.MeshPhysicalMaterial({ color: "#d5b36d", metalness: 1, roughness: 0.16, clearcoat: 0.62, clearcoatRoughness: 0.1 })
+    new THREE.MeshPhysicalMaterial({ color: "#d7b46c", metalness: 1, roughness: 0.16, clearcoat: 0.62, clearcoatRoughness: 0.1 })
   );
   edge.position.y = -0.25;
   edge.castShadow = true;
@@ -233,7 +233,7 @@ export function createChessScene3D(host, onSquareClick) {
   // Ceylon-blue sapphire cabochons are bezel-set into all four frame corners.
   // Opaque decorative stones avoid costly transmission rendering and milky highlights on mobile.
   const cornerSapphire = new THREE.MeshPhysicalMaterial({
-    color: "#00b96b", metalness: .12, roughness: .2,
+    color: "#315c9a", metalness: .12, roughness: .2,
     ior: 1.76, clearcoat: 0.58, clearcoatRoughness: .08,
     envMapIntensity: 0, flatShading: true
   });
@@ -288,15 +288,15 @@ export function createChessScene3D(host, onSquareClick) {
     const group = new THREE.Group();
     const isWhite = piece.color === "w";
 
-    // Emerald crystal army (computer/White) versus ruby crystal army (player/Black).
+    // Pearl Royale armies: champagne-gold diamond regalia versus polished obsidian-black.
     // High-clearcoat jewel surfaces keep the silhouettes vivid on Android WebView.
-    const crystalColor = isWhite ? "#00c878" : "#e20b38";
-    const crystalGlow = isWhite ? "#003f25" : "#4a0615";
+    const crystalColor = isWhite ? "#f2c66d" : "#17171e";
+    const crystalGlow = isWhite ? "#5a3510" : "#08080d";
     // Opaque, optically clear jewel finish: transmission is deliberately disabled
     // because mobile WebGL transmission can create a milky/plastic haze.
     // Faceted normals and restrained clearcoat create readable gemstone planes.
     const bodyMetal = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#00a968" : "#bd1238",
+      color: isWhite ? "#d6a447" : "#171820",
       metalness: 0.08,
       roughness: 0.19,
       ior: 1.72,
@@ -312,9 +312,9 @@ export function createChessScene3D(host, onSquareClick) {
     });
     const brightGold = new THREE.MeshStandardMaterial({ color: "#f2ca70", metalness: 1, roughness: 0.09 });
     const whiteGold = new THREE.MeshStandardMaterial({ color: "#fff5d9", metalness: 1, roughness: 0.055 });
-    const shadowMetal = new THREE.MeshStandardMaterial({ color: "#6f2436", metalness: 0.88, roughness: 0.16 });
+    const shadowMetal = new THREE.MeshStandardMaterial({ color: "#6e5738", metalness: 0.88, roughness: 0.16 });
     const sapphire = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#28e99b" : "#f02d58",
+      color: isWhite ? "#e6bd67" : "#c6a65f",
       metalness: 0.06, roughness: 0.11,
       ior: 1.72, clearcoat: 0.62, clearcoatRoughness: 0.09,
       iridescence: 0.28, iridescenceIOR: 1.45,
@@ -328,15 +328,15 @@ export function createChessScene3D(host, onSquareClick) {
       envMapIntensity: 1.25
     });
     const pearl = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#b9ffe0" : "#ffc0cd",
+      color: isWhite ? "#ffe4a8" : "#8e8993",
       metalness: 0.03, roughness: 0.065,
       clearcoat: 1, clearcoatRoughness: 0.025,
       iridescence: 0.35, iridescenceIOR: 1.48,
       iridescenceThicknessRange: [320, 780],
       envMapIntensity: 0
     });
-    // UNITY AS ONE: both armies share the same champagne-gold and diamond regalia;
-    // only the crystal body and inset accent gems change from emerald to ruby.
+    // UNITY AS ONE: both armies share champagne-gold and diamond regalia;
+    // only the body finish changes: radiant gold for White, deep obsidian for Black.
     const trim = brightGold;
 
     const addMesh = (geometry, material, x=0, y=0, z=0) => {
@@ -386,7 +386,7 @@ export function createChessScene3D(host, onSquareClick) {
       group.add(stones);
     };
 
-    // Sculpted Staunton-inspired turned body, now rendered as precious metal.
+    // Sculpted royal turned body, rendered in precious gold and obsidian finishes.
     // Six deliberately different royal silhouettes. The shared design language is
     // faceted crystal, stepped gold bases and matching gem settings—not classic
     // turned Staunton profiles.
@@ -399,7 +399,7 @@ export function createChessScene3D(host, onSquareClick) {
       k: [[0,.02],[.32,.02],[.36,.08],[.30,.15],[.21,.23],[.17,.42],[.23,.51],[.19,.61],[.14,.71],[.19,.77],[.13,.83],[0,.83]]
     };
     const profile = profiles[piece.type].map(([r,h])=>new THREE.Vector2(r,h));
-    // Ten-sided crystal body creates broad, legible facet planes at phone size.
+    // Faceted body creates broad, legible polished planes at phone size.
     const turned = addMesh(new THREE.LatheGeometry(profile,10),bodyMetal);
     turned.geometry.computeVertexNormals();
     turned.castShadow = true;
