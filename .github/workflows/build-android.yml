@@ -111,6 +111,17 @@ jobs:
           EOF
           cp "$RES/mipmap-anydpi-v26/ic_launcher.xml" "$RES/mipmap-anydpi-v26/ic_launcher_round.xml"
 
+      - name: Increase Gradle distribution download timeout
+        working-directory: android
+        run: |
+          # Use the direct Gradle download host to avoid the GitHub release redirect
+          sed -i 's#services.gradle.org/distributions/#downloads.gradle.org/distributions/#' gradle/wrapper/gradle-wrapper.properties
+          if grep -q '^networkTimeout=' gradle/wrapper/gradle-wrapper.properties; then
+            sed -i 's/^networkTimeout=.*/networkTimeout=120000/' gradle/wrapper/gradle-wrapper.properties
+          else
+            printf '\nnetworkTimeout=120000\n' >> gradle/wrapper/gradle-wrapper.properties
+          fi
+
       - name: Build debug APK
         working-directory: android
         run: |
