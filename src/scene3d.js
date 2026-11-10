@@ -90,10 +90,10 @@ export function createChessScene3D(host, onSquareClick) {
       gradient.addColorStop(.82, "#c8c1b8");
       gradient.addColorStop(1, "#a9a6a2");
     } else {
-      gradient.addColorStop(0, "#173c2b");
-      gradient.addColorStop(.22, "#0b2118");
-      gradient.addColorStop(.58, "#050f0b");
-      gradient.addColorStop(1, "#010503");
+      gradient.addColorStop(0, "#39343a");
+      gradient.addColorStop(.22, "#211f25");
+      gradient.addColorStop(.58, "#101015");
+      gradient.addColorStop(1, "#07070b");
     }
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 1024, 1024);
@@ -314,7 +314,7 @@ export function createChessScene3D(host, onSquareClick) {
     const whiteGold = new THREE.MeshStandardMaterial({ color: "#fff5d9", metalness: 1, roughness: 0.055 });
     const shadowMetal = new THREE.MeshStandardMaterial({ color: "#6e5738", metalness: 0.88, roughness: 0.16 });
     const sapphire = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#e6bd67" : "#b8a06a",
+      color: isWhite ? "#e6bd67" : "#c6a65f",
       metalness: 0.06, roughness: 0.11,
       ior: 1.72, clearcoat: 0.62, clearcoatRoughness: 0.09,
       iridescence: 0.28, iridescenceIOR: 1.45,
@@ -328,7 +328,7 @@ export function createChessScene3D(host, onSquareClick) {
       envMapIntensity: 1.25
     });
     const pearl = new THREE.MeshPhysicalMaterial({
-      color: isWhite ? "#ffe4a8" : "#77727d",
+      color: isWhite ? "#ffe4a8" : "#8e8993",
       metalness: 0.03, roughness: 0.065,
       clearcoat: 1, clearcoatRoughness: 0.025,
       iridescence: 0.35, iridescenceIOR: 1.48,
