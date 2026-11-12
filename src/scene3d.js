@@ -182,6 +182,7 @@ export function createChessScene3D(host, onSquareClick) {
   const tileGeometry = new THREE.BoxGeometry(0.99, 0.13, 0.99);
   const squareMeshes = new Map();
   const pieceMeshes = [];
+  const animatedPieces = [];
 
   for (let rank = 1; rank <= 8; rank++) {
     for (let file = 0; file < 8; file++) {
@@ -488,11 +489,30 @@ export function createChessScene3D(host, onSquareClick) {
     group.scale.setScalar(1.18);
     group.position.set(file - 3.5, .30, 4.5 - rank);
     group.userData.square = square;
+    // Tiny floating diamond glints add a restrained royal shimmer without obscuring the silhouette.
+    const sparkles = [];
+    for (let i = 0; i < 2; i++) {
+      const sparkle = new THREE.Mesh(
+        new THREE.OctahedronGeometry(.032, 0),
+        new THREE.MeshStandardMaterial({
+          color: "#fff8df", emissive: "#ffe7a3", emissiveIntensity: .65,
+          metalness: .25, roughness: .14, transparent: true, opacity: .72, depthWrite: false
+        })
+      );
+      const angle = i * Math.PI + (piece.type === "k" ? .35 : 0);
+      sparkle.position.set(Math.cos(angle) * .19, .88 + i * .08, Math.sin(angle) * .19);
+      sparkle.userData.square = square;
+      sparkle.userData.royalSparkle = true;
+      group.add(sparkle);
+      sparkles.push(sparkle);
+    }
     group.traverse(obj => {
       if (obj.isMesh) { obj.castShadow=true; obj.userData.square=square; }
     });
+    group.userData.motion = { phase: Math.random() * Math.PI * 2, baseY: group.position.y, moveStart: 0 };
     piecesGroup.add(group);
     pieceMeshes.push(group);
+    animatedPieces.push({ group, sparkles });
   }
 
   function resize() {
@@ -597,6 +617,19 @@ export function createChessScene3D(host, onSquareClick) {
           }
         }
       }
+      // Animate the just-moved piece from its previous square to its new square.
+      if (lastMove?.from && lastMove?.to) {
+        const movedPiece = pieceMeshes.find(item => item.userData.square === lastMove.to);
+        if (movedPiece) {
+          const fromFile = "abcdefgh".indexOf(lastMove.from[0]);
+          const fromRank = Number(lastMove.from[1]);
+          movedPiece.position.x = fromFile - 3.5;
+          movedPiece.position.z = 4.5 - fromRank;
+          movedPiece.userData.motion.moveStart = performance.now();
+          movedPiece.userData.motion.fromX = movedPiece.position.x;
+          movedPiece.userData.motion.fromZ = movedPiece.position.z;
+        }
+      }
       currentPositionKey = positionKey;
     }
     for (const name of legalTargets) {
@@ -605,6 +638,22 @@ export function createChessScene3D(host, onSquareClick) {
       dot.rotation.x = -Math.PI/2;
       dot.position.set(file-3.5,.315,4.5-rank);
       targetsGroup.add(dot);
+    }
+    // A soft champagne-gold pulse marks the destination of the latest move.
+    if (lastMove?.to) {
+      const file = "abcdefgh".indexOf(lastMove.to[0]);
+      const rank = Number(lastMove.to[1]);
+      const pulse = new THREE.Mesh(
+        new THREE.TorusGeometry(.34, .014, 8, 48),
+        new THREE.MeshStandardMaterial({
+          color: "#f6d58c", emissive: "#d9a84f", emissiveIntensity: .8,
+          metalness: .85, roughness: .18, transparent: true, opacity: .78, depthWrite: false
+        })
+      );
+      pulse.rotation.x = -Math.PI / 2;
+      pulse.position.set(file - 3.5, .325, 4.5 - rank);
+      pulse.userData.royalPulse = true;
+      targetsGroup.add(pulse);
     }
     if (currentFlipped !== flipped) {
       camera.position.set(0, 10.5, flipped ? -12.8 : 12.8);
@@ -617,6 +666,36 @@ export function createChessScene3D(host, onSquareClick) {
 
   function animate() {
     requestAnimationFrame(animate);
+    const now = performance.now();
+    const seconds = now * .001;
+    for (const item of animatedPieces) {
+      const { group, sparkles } = item;
+      const motion = group.userData.motion;
+      if (motion.moveStart) {
+        const progress = Math.min(1, (now - motion.moveStart) / 420);
+        const eased = progress * progress * (3 - 2 * progress);
+        const file = "abcdefgh".indexOf(group.userData.square[0]);
+        const rank = Number(group.userData.square[1]);
+        group.position.x = motion.fromX + (file - 3.5 - motion.fromX) * eased;
+        group.position.z = motion.fromZ + (4.5 - rank - motion.fromZ) * eased;
+        if (progress >= 1) motion.moveStart = 0;
+      }
+      group.position.y = motion.baseY + Math.sin(seconds * 1.7 + motion.phase) * .012;
+      group.rotation.y = Math.sin(seconds * .85 + motion.phase) * .025;
+      sparkles.forEach((sparkle, index) => {
+        sparkle.rotation.y += .018 + index * .006;
+        const shimmer = .52 + .34 * Math.sin(seconds * 3.2 + motion.phase + index * 1.7);
+        sparkle.material.opacity = shimmer;
+        sparkle.scale.setScalar(.82 + shimmer * .28);
+      });
+    }
+    for (const effect of targetsGroup.children) {
+      if (effect.userData.royalPulse) {
+        const pulse = .92 + .12 * Math.sin(seconds * 4.2);
+        effect.scale.setScalar(pulse);
+        effect.material.opacity = .56 + .28 * (Math.sin(seconds * 4.2) + 1) / 2;
+      }
+    }
     controls.update();
     renderer.render(scene,camera);
   }
