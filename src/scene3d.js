@@ -607,6 +607,7 @@ export function createChessScene3D(host, onSquareClick) {
     if (currentPositionKey !== positionKey) {
       disposeGroup(piecesGroup);
       pieceMeshes.length = 0;
+      animatedPieces.length = 0;
       const board = game.board();
       for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
